@@ -252,14 +252,68 @@ export default function App() {
                   </div>
                 </div>
                 <div className="space-y-6 flex flex-col">
+                  {/* Patient Posture Card */}
                   <div className={`p-6 rounded-[2.5rem] border ${cardClass}`}>
-                    <h4 className="text-[10px] text-slate-400 uppercase mb-4 flex items-center gap-2 font-normal"><HeartPulse size={12} className="text-rose-500" /> Patient posture</h4>
-                    <div className="bg-indigo-50 border border-indigo-100 p-5 rounded-[2rem] flex items-center justify-between text-indigo-900"><span className="text-xl font-normal">{currentAction}</span><ActivityIcon className="animate-pulse" /></div>
+                    <h4 className="text-[10px] text-slate-400 uppercase mb-4 flex items-center gap-2 font-normal">
+                      <HeartPulse size={12} className="text-rose-500" /> Patient posture
+                    </h4>
+                    <div className="bg-indigo-50 border border-indigo-100 p-5 rounded-[2rem] flex items-center justify-between text-indigo-900">
+                      <span className="text-xl font-normal">{currentAction}</span>
+                      <ActivityIcon className="animate-pulse" />
+                    </div>
                   </div>
+
+                  {/* Daily Regimen Card */}
                   <div className={`p-6 rounded-[2.5rem] border flex-1 overflow-hidden ${cardClass}`}>
-                    <div className="flex items-center justify-between mb-4"><h4 className="text-[10px] text-slate-400 uppercase font-normal tracking-wide">Daily regimen</h4><button onClick={readScheduleAloud} disabled={isSpeaking} className="p-2 bg-indigo-50 text-indigo-600 rounded-xl">{isSpeaking ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}</button></div>
-                    <div className="space-y-2">{medications.map((m, i) => <div key={i} className={`p-3 rounded-2xl border flex items-center gap-4 ${m.completed ? 'bg-emerald-50 border-emerald-100 opacity-60' : darkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-50 border-slate-100'}`}><div className={`w-8 h-8 rounded-full flex items-center justify-center ${m.completed ? 'bg-emerald-500 text-white' : 'bg-indigo-100 text-indigo-600'}`}>{m.completed ? <CheckCircle size={14} /> : <Pill size={14} />}</div><div><p className="text-xs font-normal">{m.med}</p><span className="text-[9px] text-slate-400 uppercase font-normal">{m.time} • {m.dose}</span></div></div>)}</div>
-                    <button onClick={readScheduleAloud} disabled={isSpeaking} className="w-full mt-4 py-2 text-[10px] uppercase text-indigo-500 hover:underline transition-all">Listen to schedule</button>
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-[10px] text-slate-400 uppercase font-normal tracking-wide">Daily regimen</h4>
+                      <button 
+                        onClick={readScheduleAloud} 
+                        disabled={isSpeaking} 
+                        className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"
+                      >
+                        {isSpeaking ? <Loader2 size={16} className="animate-spin" /> : <Volume2 size={16} />}
+                      </button>
+                    </div>
+
+                    <div className="space-y-2">
+                      {medications.map((m, i) => (
+                        <div 
+                          key={i} 
+                          className={`p-3 rounded-2xl border flex items-center gap-4 ${
+                            m.completed 
+                              ? (darkMode ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-100') 
+                              : (darkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-slate-50 border-slate-100')
+                          }`}
+                        >
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            m.completed ? 'bg-emerald-500 text-white' : 'bg-indigo-100 text-indigo-600'
+                          }`}>
+                            {m.completed ? <CheckCircle size={14} /> : <Pill size={14} />}
+                          </div>
+                          <div>
+                            <p className={`text-xs font-bold leading-none mb-1 ${
+                              darkMode ? 'text-white' : 'text-slate-900'
+                            }`}>
+                              {m.med}
+                            </p>
+                            <span className={`text-[9px] uppercase font-bold tracking-wider ${
+                              darkMode ? 'text-emerald-400' : 'text-slate-500'
+                            }`}>
+                              {m.time} • {m.dose}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button 
+                      onClick={readScheduleAloud} 
+                      disabled={isSpeaking} 
+                      className="w-full mt-4 py-2 text-[10px] uppercase text-indigo-500 hover:underline transition-all"
+                    >
+                      Listen to schedule
+                    </button>
                   </div>
                 </div>
               </div>
