@@ -61,15 +61,22 @@ const DATA_DAY = [
 ];
 
 const DATA_WEEK = [
-  { label: 'Mon', steps: 4200 }, { label: 'Tue', steps: 5800 },
-  { label: 'Wed', steps: 3100 }, { label: 'Thu', steps: 4900 },
-  { label: 'Fri', steps: 6300 }, { label: 'Sat', steps: 2100 }, { label: 'Sun', steps: 1400 },
+  { label: 'Mon', steps: 4200 }, 
+  { label: 'Tue', steps: 5800 },
+  { label: 'Wed', steps: 3100 }, 
+  { label: 'Thu', steps: 7200 },
+  { label: 'Fri', steps: 6300 }, 
+  { label: 'Sat', steps: 8900 }, 
+  { label: 'Sun', steps: 5400 },
 ];
 
 const DATA_MONTH = [
-  { label: 'Week 1', steps: 28400 }, { label: 'Week 2', steps: 31200 },
-  { label: 'Week 3', steps: 25600 }, { label: 'Week 4', steps: 34100 },
+  { label: 'Week 1', steps: 28400 }, 
+  { label: 'Week 2', steps: 35200 },
+  { label: 'Week 3', steps: 21600 }, 
+  { label: 'Week 4', steps: 41100 },
 ];
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -324,11 +331,71 @@ export default function App() {
 
           {currentPage === 'Wellness Stats' && (
             <div className="space-y-8 animate-in fade-in duration-700">
-              <div className="flex items-center justify-between"><h1 className={`text-3xl tracking-tight font-normal ${darkMode ? 'text-white' : 'text-slate-800'}`}>Wellness center</h1><div className={`p-1 rounded-3xl border flex ${cardClass}`}>{['Day', 'Week', 'Month'].map(r => <button key={r} onClick={() => setWellnessRange(r)} className={`px-10 py-3 rounded-2xl text-xs transition-all uppercase tracking-widest font-normal ${wellnessRange === r ? 'bg-[#4F46E5] text-white shadow-xl' : 'text-slate-500 hover:bg-slate-50'}`}>{r}</button>)}</div></div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6"><MetricCard label="Steps" value={wellnessRange === 'Day' ? "5,420" : "32,100"} trend="+5.2%" darkMode={darkMode} /><MetricCard label="Stability" value="88%" trend="Normal" darkMode={darkMode} /><MetricCard label="Active effort" value={wellnessRange === 'Day' ? "42m" : "280m"} trend="+12%" darkMode={darkMode} /><MetricCard label="Sync health" value="99%" trend="Secure" darkMode={darkMode} /></div>
+              <div className="flex items-center justify-between">
+                <h1 className={`text-3xl tracking-tight font-normal ${darkMode ? 'text-white' : 'text-slate-800'}`}>Wellness center</h1>
+                <div className={`p-1 rounded-3xl border flex ${cardClass}`}>
+                  {['Day', 'Week', 'Month'].map(r => (
+                    <button key={r} onClick={() => setWellnessRange(r)} className={`px-10 py-3 rounded-2xl text-xs transition-all uppercase tracking-widest font-normal ${wellnessRange === r ? 'bg-[#4F46E5] text-white shadow-xl' : 'text-slate-500 hover:bg-slate-50'}`}>
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* DYNAMIC DATA CARDS */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <MetricCard 
+                  label="Steps" 
+                  value={wellnessRange === 'Day' ? "5,420" : wellnessRange === 'Week' ? "32,100" : "128,400"} 
+                  trend={wellnessRange === 'Day' ? "+5.2%" : "+8.1%"} 
+                  darkMode={darkMode} 
+                />
+                <MetricCard 
+                  label="Stability" 
+                  value={wellnessRange === 'Day' ? "88%" : wellnessRange === 'Week' ? "92%" : "90%"} 
+                  trend="Normal" 
+                  darkMode={darkMode} 
+                />
+                <MetricCard 
+                  label="Active effort" 
+                  value={wellnessRange === 'Day' ? "42m" : wellnessRange === 'Week' ? "280m" : "1,120m"} 
+                  trend={wellnessRange === 'Day' ? "+12%" : "+15%"} 
+                  darkMode={darkMode} 
+                />
+                <MetricCard 
+                  label="Sync health" 
+                  value="99%" 
+                  trend="Secure" 
+                  darkMode={darkMode} 
+                />
+              </div>
+
               <div className={`p-12 rounded-[3.5rem] border ${cardClass}`}>
                 <h3 className="text-lg mb-10 font-normal">Intensity trend ({wellnessRange})</h3>
-                <div className="h-[400px]"><ResponsiveContainer width="100%" height="100%">{wellnessRange === 'Day' ? <AreaChart data={DATA_DAY}><defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2}/><stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke={darkMode ? "#334155" : "#F1F5F9"} /><XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><YAxis axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><Area type="monotone" dataKey="intensity" stroke="#4F46E5" strokeWidth={5} fillOpacity={1} fill="url(#c)" /></AreaChart> : <BarChart data={wellnessRange === 'Week' ? DATA_WEEK : DATA_MONTH}><CartesianGrid vertical={false} stroke={darkMode ? "#334155" : "#F1F5F9"} /><XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><YAxis axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><Bar dataKey="steps" fill="#4F46E5" radius={[15, 15, 0, 0]} /></BarChart>}</ResponsiveContainer></div>
+                <div className="h-[400px]"><ResponsiveContainer width="100%" height="100%">{wellnessRange === 'Day' ? <AreaChart data={DATA_DAY}><defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2}/><stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} stroke={darkMode ? "#334155" : "#F1F5F9"} /><XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><YAxis axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 11}} /><Area type="monotone" dataKey="intensity" stroke="#4F46E5" strokeWidth={5} fillOpacity={1} fill="url(#c)" /></AreaChart> : <BarChart data={wellnessRange === 'Week' ? DATA_WEEK : DATA_MONTH}>
+  <CartesianGrid vertical={false} stroke={darkMode ? "#334155" : "#F1F5F9"} strokeDasharray="3 3" />
+  <XAxis 
+    dataKey="label" 
+    axisLine={false} 
+    tickLine={false} 
+    tick={{fill: darkMode ? '#94A3B8' : '#64748B', fontSize: 12}} 
+  />
+  <YAxis 
+    axisLine={false} 
+    tickLine={false} 
+    tick={{fill: darkMode ? '#94A3B8' : '#64748B', fontSize: 12}} 
+  />
+  <Tooltip 
+    cursor={{fill: darkMode ? '#1E293B' : '#F8FAFC'}}
+    contentStyle={{ borderRadius: '15px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
+  />
+  <Bar 
+    dataKey="steps" 
+    fill="#4F46E5" 
+    radius={[10, 10, 0, 0]} 
+    barSize={wellnessRange === 'Week' ? 40 : 60} 
+  />
+</BarChart>}</ResponsiveContainer></div>
               </div>
             </div>
           )}
