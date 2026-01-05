@@ -195,9 +195,11 @@ export default function App() {
       <aside className={`w-64 flex flex-col z-20 ${darkMode ? 'bg-slate-950 border-r border-slate-800' : 'bg-[#0F172A] shadow-2xl'}`}>
         <div className="p-8 flex flex-col items-center border-b border-slate-800">
           <div className="bg-[#4F46E5] p-3 rounded-2xl mb-4 text-white"><Shield size={32} /></div>
-          <h1 className="text-xl text-white uppercase tracking-tight font-normal">ElderGuard</h1>
-          <span className="text-[10px] text-slate-500 uppercase tracking-wide font-normal">Security gateway</span>
-        </div>
+          <h1 className="text-xl text-white uppercase tracking-tight font-normal">AmbiSense</h1>
+          <span className="text-[10px] text-slate-300 uppercase tracking-widest font-medium mt-2 block">
+            Security gateway
+          </span>       
+         </div>
         <nav className="flex-1 py-6 px-4 space-y-1 overflow-y-auto no-scrollbar">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Dashboard" active={currentPage === 'Dashboard'} onClick={() => setCurrentPage('Dashboard')} />
           <NavItem icon={<Activity size={20}/>} label="Wellness stats" active={currentPage === 'Wellness Stats'} onClick={() => setCurrentPage('Wellness Stats')} />
@@ -386,7 +388,7 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
       <div className={`w-full max-w-md rounded-[3.5rem] shadow-2xl p-12 border flex flex-col items-center relative z-10 animate-in fade-in zoom-in duration-700 ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'}`}>
         <div className="bg-[#4F46E5] p-6 rounded-[2.5rem] text-white mb-8 shadow-xl shadow-indigo-600/30 font-normal"><Shield size={56} /></div>
-        <h1 className="text-4xl tracking-tighter mb-2 uppercase text-[#1E293B] dark:text-white font-normal text-center">ElderGuard</h1>
+        <h1 className="text-4xl tracking-tighter mb-2 uppercase text-[#1E293B] dark:text-white font-normal text-center">Ambisense</h1>
         <p className="text-[#64748B] text-xs uppercase tracking-wide mb-12 font-normal text-center underline decoration-indigo-200">Authentication portal</p>
         <form onSubmit={(e) => { e.preventDefault(); onLogin({ email, role }); }} className="w-full space-y-7 text-slate-800">
           <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={`w-full px-8 py-5 rounded-[2rem] border focus:ring-4 focus:ring-indigo-50 outline-none text-sm transition-all font-normal ${darkMode ? 'bg-slate-800 border-slate-700 text-white' : 'bg-[#F8FAFC] border-slate-200 text-slate-900'}`} placeholder="Email address" />
@@ -404,12 +406,51 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
   );
 }
 
+
 function NavItem({ icon, label, active, onClick }) {
-  return (<button onClick={onClick} className={`w-full flex items-center gap-5 px-6 py-5 rounded-3xl transition-all duration-300 tracking-wide font-normal ${active ? 'bg-[#4F46E5] text-white shadow-2xl translate-x-1.5' : 'text-slate-500 hover:text-white hover:bg-slate-800'}`}><div className={active ? 'text-white' : 'text-slate-600'}>{icon}</div><span className="text-sm tracking-tight">{label}</span></button>);
+  return (
+    <button 
+      onClick={onClick} 
+      className={`w-full flex items-center gap-5 px-6 py-5 rounded-3xl transition-all duration-300 tracking-wide font-normal ${
+        active 
+          ? 'bg-[#4F46E5] text-white shadow-2xl translate-x-1.5' 
+          : 'text-slate-400 hover:text-white hover:bg-white/10'
+      }`}
+    >
+      <div className={active ? 'text-white' : 'text-slate-400'}>
+        {icon}
+      </div>
+      <span className="text-sm tracking-tight">{label}</span>
+    </button>
+  );
 }
 
 function MetricCard({ label, value, trend, darkMode }) {
-  return (<div className={`p-8 rounded-[2.5rem] border shadow-sm flex flex-col justify-center transition-all font-normal ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}><p className="text-[10px] text-[#64748B] uppercase tracking-wide mb-2 font-normal">{label}</p><div className="flex items-end justify-between font-normal"><h3 className="text-3xl tracking-tighter">{value}</h3><div className={`text-[10px] px-3 py-1 rounded-full bg-[#ECFDF5] text-[#059669] border border-emerald-100 uppercase`}>{trend}</div></div></div>);
+  return (
+    <div className={`p-8 rounded-[2.5rem] border shadow-sm flex flex-col justify-center transition-all font-normal ${
+      darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'
+    }`}>
+      <p className={`text-[10px] uppercase tracking-widest mb-2 font-bold ${
+        darkMode ? 'text-slate-400' : 'text-slate-500'
+      }`}>
+        {label}
+      </p>
+      <div className="flex items-end justify-between font-normal">
+        <h3 className={`text-3xl tracking-tighter font-bold ${
+          darkMode ? 'text-white' : 'text-slate-900'
+        }`}>
+          {value}
+        </h3>
+        <div className={`text-[10px] px-3 py-1 rounded-full uppercase font-bold ${
+          trend.includes('+') || trend === 'Normal' || trend === 'Secure'
+            ? (darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-100 text-emerald-700')
+            : (darkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-100 text-indigo-700')
+        }`}>
+          {trend}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function MedRow({ time, med, dose, completed, darkMode }) {
