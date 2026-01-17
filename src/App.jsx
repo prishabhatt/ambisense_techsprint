@@ -4,7 +4,8 @@ import {
   Bell, AlertTriangle, CheckCircle, Eye, EyeOff, Calendar, 
   Send, ArrowRight, Sparkles, Volume2, Search, 
   Loader2, Settings, Info, Activity as ActivityIcon,
-  Pill, HeartPulse, UserCircle, Trash2, Edit3, Sun, Moon, Thermometer, Wind, X, ArrowUpRight
+  Pill, HeartPulse, UserCircle, Trash2, Edit3, Sun, Moon, Thermometer, Wind, X, 
+  ArrowUpRight, ShieldCheck
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
@@ -263,12 +264,21 @@ export default function App() {
                   </div>
                 </div>
                 <div className="space-y-8 flex flex-col">
-                  <div className={`p-10 rounded-[50px] border flex flex-col items-center justify-center text-center ${cardClass}`}>
-                    <HeartPulse size={24} className="text-rose-500 mb-4" />
-                    <h4 className="text-[10px] text-[#2D3E2F]/40 uppercase font-black tracking-[0.3em] mb-3">Posture</h4>
-                    <div className="bg-[#2D3E2F]/5 border border-[#2D3E2F]/5 p-6 rounded-[30px] flex items-center justify-center gap-4 text-[#2D3E2F] w-full">
-                      <span className="text-3xl font-serif italic">{currentAction}</span>
+                 <div className={`p-10 rounded-[50px] border flex flex-col items-center justify-center text-center transition-all duration-500 ${
+                    currentAction === 'Falling' ? 'bg-rose-50 border-rose-200 shadow-xl shadow-rose-500/10' : cardClass
+                  }`}>
+                    <div className={`p-4 rounded-full mb-4 transition-colors duration-500 ${
+                      currentAction === 'Falling' ? 'bg-rose-500 text-white animate-bounce' : 'bg-[#2D3E2F]/5 text-[#2D3E2F]'
+                    }`}>
+                      <ActivityIcon size={24} className={currentAction !== 'Resting' ? 'animate-pulse' : ''} />
                     </div>
+                    <h4 className="text-[10px] text-[#2D3E2F]/40 uppercase font-black tracking-[0.4em] mb-3 opacity-90 bg-clip-padding">Live Posture</h4>
+                    <span className={`text-4xl font-serif italic transition-colors duration-500 ${currentAction === 'Falling' ? 'text-rose-600' : 'text-[#2D3E2F]'}`}>
+                      {currentAction}
+                    </span>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30 mt-2">
+                      {currentAction === 'Resting' ? 'Steady State' : 'Movement Active'}
+                    </p>
                   </div>
 
                   <div className={`p-10 rounded-[50px] border flex-1 overflow-hidden ${cardClass}`}>
@@ -367,11 +377,11 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
         
         {/* --- BRAND LOGO (Matching Landing Page) --- */}
         <div className="group flex flex-col items-center mb-12">
-          <div className="bg-[#2D3E2F] p-8 rounded-[30px] text-[#F0EFE9] mb-6 shadow-2xl shadow-[#2D3E2F]/40 transition-transform duration-500 group-hover:scale-105">
-            <Shield size={56} strokeWidth={1.5} />
+          <div className="w-16 h-16 bg-[#2D3E2F] rounded-2xl flex items-center justify-center text-white mx-auto mb-6">
+            <ShieldCheck size={32} />
           </div>
           <h1 className="text-5xl font-serif text-[#1C1C1C] mb-2 tracking-tighter">AmbiSense</h1>
-          <p className="text-[#2D3E2F]/40 text-[10px] font-black uppercase tracking-[0.4em] underline decoration-[#2D3E2F]/10 underline-offset-8">
+          <p className="text-[#2D3E2F]/40 text-l font-serif font-bold text-[#1C1C1C] tracking-tight uppercase tracking-[0.4em] decoration-[#2D3E2F]/10 underline-offset-8">
             Authorized Access Only
           </p>
         </div>
@@ -382,13 +392,13 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
             type="email" 
             required 
             placeholder="Identifier"
-            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 font-bold ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
+            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 text-[21px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
           />
           <input 
             type="password" 
             required 
             placeholder="Passkey"
-            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 font-bold ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
+            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 text-[21px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
           />
           
           <div className={`flex p-2 rounded-full gap-1 border border-[#2D3E2F]/5 ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5'}`}>
@@ -397,7 +407,7 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
                 key={r} 
                 type="button" 
                 onClick={() => setRole(r)} 
-                className={`flex-1 py-4 text-[9px] font-black uppercase tracking-widest rounded-full transition-all ${role === r ? 'bg-[#2D3E2F] text-white shadow-xl' : 'text-[#2D3E2F]/30'}`}
+                className={`flex-1 py-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all ${role === r ? 'bg-[#2D3E2F] text-white shadow-xl' : 'text-[#2D3E2F]/30'}`}
               >
                 {r}
               </button>
@@ -405,13 +415,13 @@ function LoginPage({ onLogin, darkMode, setDarkMode }) {
           </div>
 
           <button className="w-full group bg-[#2D3E2F] text-[#F0EFE9] py-7 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-[#2D3E2F]/40">
-            <div className="flex items-center justify-center gap-4 font-black text-xs uppercase tracking-[0.3em]">
+            <div className="flex items-center justify-center gap-4 font-black text-[13px] font-black uppercase tracking-widest">
               Authorize Session <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
             </div>
           </button>
         </form>
         
-        <button onClick={() => setOtpModal(true)} className="mt-12 text-[10px] text-[#2D3E2F] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all">
+        <button onClick={() => setOtpModal(true)} className="mt-12 text-[11px] text-[#2D3E2F] font-black uppercase tracking-widest opacity-70 hover:opacity-100 transition-all">
           Request access code
         </button>
 
