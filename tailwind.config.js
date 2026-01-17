@@ -2,14 +2,18 @@
 export default {
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    "./src/**/*.{js,ts,jsx, Broadway}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
-      animation: {
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      }
+      colors: {
+        brandGreen: '#2D3E2F',
+        brandCream: '#F0EFE9',
+        brandSilk: '#FAF9F6',
+      },
+      fontFamily: {
+        serif: ['Lora', 'serif'], // Or whichever serif font you are using
+      },
     },
   },
   plugins: [],
