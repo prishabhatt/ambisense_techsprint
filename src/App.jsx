@@ -5,12 +5,46 @@ import {
   Send, ArrowRight, Sparkles, Volume2, Search, 
   Loader2, Settings, Info, Activity as ActivityIcon,
   Pill, HeartPulse, UserCircle, Trash2, Edit3, Sun, Moon, Thermometer, Wind, X, 
-  ArrowUpRight, ShieldCheck
+  ArrowUpRight, ShieldCheck, Lock, Fingerprint, ChevronRight, Menu, Plus
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar
 } from 'recharts';
+
+export default function App() {
+  const [view, setView] = useState('landing');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+
+  
+
+
+  // This handles the toggle between Login and Dashboard
+  if (!isLoggedIn) {
+    return (
+      <LoginPage 
+        darkMode={darkMode} 
+        setDarkMode={setDarkMode} 
+        onLogin={(u) => { 
+          setUser(u); 
+          setIsLoggedIn(true); 
+        }} 
+      />
+    );
+  }
+
+  return (
+    <DashboardUI 
+      user={user} 
+      isLoggedIn={isLoggedIn} 
+      setIsLoggedIn={setIsLoggedIn} 
+      setUser={setUser}
+      onLogout={() => setIsLoggedIn(false)} 
+    />
+  );
+}
 
 // --- CONFIG ---
 const apiKey = ""; 
@@ -72,10 +106,12 @@ const DATA_MONTH = [
   { label: 'Week 3', steps: 21600 }, { label: 'Week 4', steps: 41100 },
 ];
 
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null); 
-  const [currentPage, setCurrentPage] = useState('Dashboard');
+const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => {
+  // 1. Keep the Page state
+  const [currentPage, setCurrentPage] = useState('Dashboard'); 
+  
+  // 2. REMOVE the extra isLoggedIn state here (it's already in props!)
+  
   const [isAlerting, setIsAlerting] = useState(false);
   const [isSOSActive, setIsSOSActive] = useState(false);
   const [wellnessRange, setWellnessRange] = useState('Day');
@@ -114,14 +150,16 @@ export default function App() {
   ];
 
   useEffect(() => {
-    if (!isLoggedIn) return;
+    // Change this line to check the prop specifically
+    if (isLoggedIn === false) return; 
+
     const interval = setInterval(() => {
       const actions = ['Walking', 'Sitting', 'Standing', 'Resting'];
       setCurrentAction(actions[Math.floor(Math.random() * actions.length)]);
     }, 6000);
     return () => clearInterval(interval);
-  }, [isLoggedIn]);
-
+  }, [isLoggedIn]); // Keep this as the dependency
+  
   const activateSOS = () => { setIsSOSActive(true); setIsAlerting(true); };
 
   const readScheduleAloud = async () => {
@@ -217,8 +255,11 @@ export default function App() {
           <NavItem icon={<User size={20}/>} label="Profile" active={currentPage === 'Profile'} onClick={() => setCurrentPage('Profile')} />
         </nav>
         <div className="p-6 border-t border-white/10">
-          <button onClick={() => setIsLoggedIn(false)} className="w-full flex items-center justify-center gap-3 px-4 py-4 text-[#F0EFE9]/40 hover:text-white hover:bg-white/5 rounded-[20px] transition-all text-xs font-bold uppercase tracking-widest">
-            <LogOut size={18} /> Logout System
+          <button 
+          onClick={onLogout} 
+          className="w-full flex items-center justify-center gap-3 px-4 py-4 text-[#F0EFE9]/40 hover:text-white hover:bg-white/5 rounded-[20px] transition-all text-xs font-bold uppercase tracking-widest"
+          >
+          <LogOut size={18} /> Logout System
           </button>
         </div>
       </aside>
@@ -367,80 +408,101 @@ export default function App() {
 
 // --- REUSABLE SUB-COMPONENTS ---
 
-function LoginPage({ onLogin, darkMode, setDarkMode }) {
+function LoginPage({ onLogin, backToWeb }) {
   const [role, setRole] = useState('caregiver');
-  const [otpModal, setOtpModal] = useState(false);
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-10 relative overflow-hidden ${darkMode ? 'bg-slate-950' : 'bg-[#F0EFE9]'}`}>
-      <div className={`w-full max-w-lg rounded-[60px] shadow-[0_50px_100px_-20px_rgba(45,62,47,0.3)] p-16 border flex flex-col items-center relative z-10 animate-in fade-in zoom-in duration-1000 ${darkMode ? 'bg-slate-900 border-slate-800 shadow-none' : 'bg-[#FAF9F6] border-[#2D3E2F]/10'}`}>
+    <div className="min-h-screen bg-[#F3F1E9] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+      {/* Decorative Brand Background */}
+      <div className="absolute top-0 right-0 w-1/3 h-full bg-[#2D3E2F]/5 -skew-x-12 translate-x-20 z-0" />
+      
+      <div className="w-full max-w-5xl bg-white rounded-[40px] shadow-[0_50px_100px_-20px_rgba(45,62,47,0.15)] flex flex-col md:flex-row overflow-hidden relative z-10 border border-[#2D3E2F]/5">
         
-        {/* --- BRAND LOGO (Matching Landing Page) --- */}
-        <div className="group flex flex-col items-center mb-12">
-          <div className="w-16 h-16 bg-[#2D3E2F] rounded-2xl flex items-center justify-center text-white mx-auto mb-6">
-            <ShieldCheck size={32} />
+        {/* Left Side: Branding & Experience */}
+        <div className="w-full md:w-5/12 bg-[#2D3E2F] p-12 text-white flex flex-col justify-between relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-20 translate-x-20" />
+          
+          <div className="relative z-10">
+            <div className="w-12 h-12 bg-white/10 backdrop-blur-md rounded-xl flex items-center justify-center mb-8 border border-white/10">
+              <ShieldCheck size={24} />
+            </div>
+            <h2 className="text-4xl font-serif leading-tight tracking-tight mb-4">
+              The standard for <br />
+              <span className="italic font-light opacity-80 text-[#F3F1E9]">dignified care.</span>
+            </h2>
+            <p className="text-sm text-white/50 leading-relaxed max-w-xs uppercase tracking-widest font-bold text-[10px]">
+              Encrypted Session Architecture v4.0
+            </p>
           </div>
-          <h1 className="text-5xl font-serif text-[#1C1C1C] mb-2 tracking-tighter">AmbiSense</h1>
-          <p className="text-[#2D3E2F]/40 text-l font-serif font-bold text-[#1C1C1C] tracking-tight uppercase tracking-[0.4em] decoration-[#2D3E2F]/10 underline-offset-8">
-            Authorized Access Only
-          </p>
+
+          <div className="relative z-10 space-y-4 opacity-40">
+             <div className="flex items-center gap-3">
+               <Fingerprint size={16} />
+               <span className="text-[10px] font-bold uppercase tracking-widest">Biometric Ready</span>
+             </div>
+             <div className="flex items-center gap-3">
+               <Lock size={16} />
+               <span className="text-[10px] font-bold uppercase tracking-widest">ISO 27001 Compliant</span>
+             </div>
+          </div>
         </div>
 
-        {/* --- LOGIN FORM --- */}
-        <form onSubmit={(e) => { e.preventDefault(); onLogin({ role }); }} className="w-full space-y-6">
-          <input 
-            type="email" 
-            required 
-            placeholder="Identifier"
-            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 text-[21px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
-          />
-          <input 
-            type="password" 
-            required 
-            placeholder="Passkey"
-            className={`w-full px-10 py-6 rounded-full border outline-none text-sm transition-all placeholder-[#2D3E2F]/20 text-[21px] ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-transparent border-[#2D3E2F]/10 focus:border-[#2D3E2F]'}`} 
-          />
+        {/* Right Side: Access Control */}
+        <div className="flex-1 p-12 md:p-20 flex flex-col justify-center bg-white">
+          <div className="mb-12">
+            <h1 className="text-4xl font-serif text-[#1C1C1C] tracking-tighter mb-2">Access Portal</h1>
+            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-[#2D3E2F]/40">Authorized Entry Only</p>
+          </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); onLogin({ role }); }} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-[#2D3E2F]/60 ml-1 tracking-widest">Node Identifier</label>
+              <input 
+                type="email" 
+                required 
+                placeholder="care@ambisense.ai"
+                className="w-full px-6 py-4 rounded-2xl border border-[#2D3E2F]/10 bg-[#F3F1E9]/30 focus:bg-white focus:border-[#2D3E2F] focus:ring-4 focus:ring-[#2D3E2F]/5 outline-none transition-all placeholder:text-[#1C1C1C]/20" 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase text-[#2D3E2F]/60 ml-1 tracking-widest">Access Key</label>
+              <input 
+                type="password" 
+                required 
+                placeholder="••••••••"
+                className="w-full px-6 py-4 rounded-2xl border border-[#2D3E2F]/10 bg-[#F3F1E9]/30 focus:bg-white focus:border-[#2D3E2F] focus:ring-4 focus:ring-[#2D3E2F]/5 outline-none transition-all placeholder:text-[#1C1C1C]/20" 
+              />
+            </div>
+
+            <div className="flex p-1.5 bg-[#F3F1E9] rounded-2xl mt-8">
+              {['caregiver', 'family'].map(r => (
+                <button 
+                  key={r} 
+                  type="button" 
+                  onClick={() => setRole(r)} 
+                  className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all duration-500 ${role === r ? 'bg-white text-[#2D3E2F] shadow-md' : 'text-[#2D3E2F]/30 hover:text-[#2D3E2F]'}`}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+
+            <button className="w-full group mt-8 bg-[#2D3E2F] text-white py-5 rounded-2xl transition-all hover:scale-[1.01] active:scale-95 shadow-xl shadow-[#2D3E2F]/20 flex items-center justify-center gap-4">
+              <span className="font-black text-[12px] uppercase tracking-[0.2em]">Authorize Portal</span>
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </form>
           
-          <div className={`flex p-2 rounded-full gap-1 border border-[#2D3E2F]/5 ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5'}`}>
-            {['caregiver', 'family'].map(r => (
-              <button 
-                key={r} 
-                type="button" 
-                onClick={() => setRole(r)} 
-                className={`flex-1 py-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all ${role === r ? 'bg-[#2D3E2F] text-white shadow-xl' : 'text-[#2D3E2F]/30'}`}
-              >
-                {r}
-              </button>
-            ))}
+          <div className="mt-12 flex justify-between items-center border-t border-[#2D3E2F]/5 pt-8">
+            <button onClick={backToWeb} className="text-[10px] text-[#2D3E2F]/60 font-black uppercase tracking-widest hover:text-[#2D3E2F] transition-colors flex items-center gap-2">
+              <ChevronRight className="rotate-180" size={14} /> Back to Web
+            </button>
+            <button className="text-[10px] text-[#2D3E2F]/40 font-bold uppercase tracking-widest hover:text-[#2D3E2F] transition-colors">
+              Reset Node
+            </button>
           </div>
-
-          <button className="w-full group bg-[#2D3E2F] text-[#F0EFE9] py-7 rounded-full transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl shadow-[#2D3E2F]/40">
-            <div className="flex items-center justify-center gap-4 font-black text-[13px] font-black uppercase tracking-widest">
-              Authorize Session <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" />
-            </div>
-          </button>
-        </form>
-        
-        <button onClick={() => setOtpModal(true)} className="mt-12 text-[11px] text-[#2D3E2F] font-black uppercase tracking-widest opacity-70 hover:opacity-100 transition-all">
-          Request access code
-        </button>
-
-        {otpModal && (
-          <div className="absolute inset-0 bg-[#2D3E2F]/95 backdrop-blur-2xl flex items-center justify-center p-12 z-50 rounded-[60px] animate-in fade-in duration-500">
-            <div className="bg-[#FAF9F6] p-12 rounded-[45px] text-center max-w-sm border border-white/10 text-[#1C1C1C]">
-              <div className="bg-emerald-50 p-8 rounded-full w-fit mx-auto mb-10 shadow-inner">
-                <CheckCircle className="text-emerald-600" size={56} />
-              </div>
-              <h3 className="text-3xl font-serif text-[#1C1C1C] mb-4">Key Dispatched</h3>
-              <p className="text-[#1C1C1C]/50 text-[10px] font-black uppercase tracking-widest leading-loose mb-12">
-                Encrypted verification code transmitted to your verified node.
-              </p>
-              <button onClick={() => setOtpModal(false)} className="w-full bg-[#1C1C1C] text-white py-6 rounded-full text-xs font-black uppercase tracking-[0.3em] active:scale-95 transition-all">
-                Enter Portal
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -479,3 +541,4 @@ function ToggleRow({ label, active, onClick, disabled, darkMode }) {
     </div>
   );
 }
+
