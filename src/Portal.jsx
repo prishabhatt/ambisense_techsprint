@@ -12,14 +12,17 @@ import {
   ResponsiveContainer, AreaChart, Area, BarChart, Bar
 } from 'recharts';
 
+const WEBSITE_URL = "http://localhost:5173"; 
+
 export default function App() {
   const [view, setView] = useState('landing');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
-  
-
+  const handleBackToWebsite = () => {
+    window.location.href = WEBSITE_URL;
+  };
 
   // This handles the toggle between Login and Dashboard
   if (!isLoggedIn) {
@@ -27,6 +30,7 @@ export default function App() {
       <LoginPage 
         darkMode={darkMode} 
         setDarkMode={setDarkMode} 
+        backToWeb={handleBackToWebsite} // FIXED: Passing the function here
         onLogin={(u) => { 
           setUser(u); 
           setIsLoggedIn(true); 
@@ -41,7 +45,11 @@ export default function App() {
       isLoggedIn={isLoggedIn} 
       setIsLoggedIn={setIsLoggedIn} 
       setUser={setUser}
-      onLogout={() => setIsLoggedIn(false)} 
+      darkMode={darkMode}    // FIXED: Passing darkMode
+      setDarkMode={setDarkMode} // FIXED: Passing setDarkMode
+      onLogout={() => {
+        setIsLoggedIn(false);
+      }} 
     />
   );
 }
@@ -106,7 +114,7 @@ const DATA_MONTH = [
   { label: 'Week 3', steps: 21600 }, { label: 'Week 4', steps: 41100 },
 ];
 
-const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => {
+const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
   // 1. Keep the Page state
   const [currentPage, setCurrentPage] = useState('Dashboard'); 
   
@@ -118,7 +126,7 @@ const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => 
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isPrivacyMasked, setIsPrivacyMasked] = useState(false);
   const [currentAction, setCurrentAction] = useState('Sitting');
-  const [darkMode, setDarkMode] = useState(false);
+  //const [darkMode, setDarkMode] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   
   const [clinicalNotes, setClinicalNotes] = useState([
@@ -248,7 +256,7 @@ const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => 
     Secure Gateway
   </span>       
 </div>
-        <nav className="flex-1 py-10 px-6 space-y-2 overflow-y-auto no-scrollbar">
+        <nav className="flex-1 py-10 px-4 space-y-2 overflow-y-auto no-scrollbar">
           <NavItem icon={<LayoutDashboard size={20}/>} label="Dashboard" active={currentPage === 'Dashboard'} onClick={() => setCurrentPage('Dashboard')} />
           <NavItem icon={<Activity size={20}/>} label="Wellness Stats" active={currentPage === 'Wellness Stats'} onClick={() => setCurrentPage('Wellness Stats')} />
           <NavItem icon={<Stethoscope size={20}/>} label="Medical Records" active={currentPage === 'Medical Records'} onClick={() => setCurrentPage('Medical Records')} />
@@ -370,7 +378,7 @@ const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => 
                 <div className="space-y-4">{clinicalNotes.map(n => <div key={n.id} className={`p-8 rounded-[35px] border ${cardClass}`}><div className="flex justify-between mb-4 text-[10px] font-black uppercase tracking-widest opacity-30"><span>{n.author}</span><span>{n.date}</span></div>{editingNoteId === n.id ? (<div className="space-y-4"><textarea value={editValue} onChange={(e) => setEditValue(e.target.value)} className="w-full p-6 rounded-2xl border bg-transparent text-sm outline-none" /><div className="flex gap-2"><button onClick={saveEdit} className="px-6 py-2 bg-[#2D3E2F] text-white rounded-full text-[10px] font-black uppercase">Save</button><button onClick={() => setEditingNoteId(null)} className="px-6 py-2 bg-slate-100 rounded-full text-[10px] font-black uppercase tracking-widest">Exit</button></div></div>) : (<><p className="text-sm leading-relaxed mb-6">{n.text}</p>{!isFamily && (<div className="flex gap-6 border-t border-[#2D3E2F]/5 pt-5"><button onClick={() => startEdit(n)} className="text-[#2D3E2F]/30 hover:text-[#2D3E2F] transition-all"><Edit3 size={16} /></button><button onClick={() => deleteNote(n.id)} className="text-[#2D3E2F]/30 hover:text-rose-500 transition-all"><Trash2 size={16} /></button></div>)}</>)}</div>)}</div>
               </div>
               <div className="space-y-12">
-                <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}><h3 className="text-2xl font-serif mb-6 flex items-center gap-4 italic tracking-tight"><Sparkles size={28}/> Research Vault</h3><div className="relative mb-10"><input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." /><button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">{isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</button></div>{researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal italic">"{researchOutput}"</div>}</div>
+                <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}><h3 className="text-2xl font-serif mb-6 flex items-center gap-4 italic tracking-tight"><Sparkles size={28}/> Research Vault</h3><div className="relative mb-10"><input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." /><button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">{isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</button></div>{researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal ">"{researchOutput}"</div>}</div>
                 <div className={`p-12 rounded-[50px] border ${cardClass}`}><div className="flex items-center justify-between mb-8"><h3 className="text-2xl font-serif italic tracking-tight">AI Insights ✨</h3><button onClick={handleSummary} disabled={isGeneratingSummary} className="p-4 bg-[#2D3E2F] text-[#F0EFE9] rounded-full hover:scale-110 active:scale-90 transition-all shadow-xl">{isGeneratingSummary ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}</button></div><div className={`p-8 rounded-[30px] text-sm leading-relaxed italic ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5 border border-[#2D3E2F]/5'}`}>"{aiSummary}"</div></div>
               </div>
             </div>
@@ -408,7 +416,7 @@ const DashboardUI = ({ user, isLoggedIn, setIsLoggedIn, setUser, onLogout }) => 
 
 // --- REUSABLE SUB-COMPONENTS ---
 
-function LoginPage({ onLogin, backToWeb }) {
+function LoginPage({ onLogin, backToWeb, darkMode, setDarkMode }) {
   const [role, setRole] = useState('caregiver');
 
   return (
@@ -510,7 +518,7 @@ function LoginPage({ onLogin, backToWeb }) {
 
 function NavItem({ icon, label, active, onClick }) {
   return (
-    <button onClick={onClick} className={`w-full flex items-center gap-6 px-8 py-5 rounded-[25px] transition-all duration-500 ${active ? 'bg-[#FAF9F6] text-[#2D3E2F] shadow-xl translate-x-3' : 'text-[#F0EFE9]/40 hover:text-[#F0EFE9] hover:bg-white/5'}`}>
+    <button onClick={onClick} className={`w-full flex items-center gap-6 px-4 py-5 rounded-[25px] transition-all duration-500 ${active ? 'bg-[#FAF9F6] text-[#2D3E2F] shadow-xl' : 'text-[#F0EFE9]/40 hover:text-[#F0EFE9] hover:bg-white/5'}`}>
       <div className={active ? 'text-[#2D3E2F]' : 'inherit'}>{icon}</div>
       <span className="text-[11px] font-black uppercase tracking-widest">{label}</span>
     </button>
@@ -542,4 +550,3 @@ function ToggleRow({ label, active, onClick, disabled, darkMode }) {
   );
 }
 
- 
