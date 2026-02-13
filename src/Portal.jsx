@@ -5,7 +5,8 @@ import {
   Send, ArrowRight, Sparkles, Volume2, Search, 
   Loader2, Settings, Info, Activity as ActivityIcon,
   Pill, HeartPulse, UserCircle, Trash2, Edit3, Sun, Moon, Thermometer, Wind, X, 
-  ArrowUpRight, ShieldCheck, Lock, Fingerprint, ChevronRight, Menu, Plus
+  ArrowUpRight, ShieldCheck, Lock, Fingerprint, ChevronRight, Menu, Plus,
+  TrendingUp, Heart, Zap, BarChart3
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
@@ -106,13 +107,26 @@ const DATA_DAY = [
 const DATA_WEEK = [
   { label: 'Mon', steps: 4200 }, { label: 'Tue', steps: 5800 },
   { label: 'Wed', steps: 3100 }, { label: 'Thu', steps: 7200 },
-  { label: 'Fri', steps: 6300 }, { label: 'Sat', steps: 8900 }, { label: 'Sun', steps: 5400 },
+  { label: 'Fri', steps: 6300 }, { label: 'Sat', steps: 8900 }, 
+  { label: 'Sun', steps: 5400 },
 ];
 
 const DATA_MONTH = [
   { label: 'Week 1', steps: 28400 }, { label: 'Week 2', steps: 35200 },
   { label: 'Week 3', steps: 21600 }, { label: 'Week 4', steps: 41100 },
 ];
+const SquareStatCard = ({ label, value, subtext, icon: Icon, bgColor, textColor = "text-[#2D3E2F]" }) => (
+  <div className={`${bgColor} aspect-square p-8 rounded-[48px] shadow-sm flex flex-col justify-between transition-all hover:scale-[1.03] active:scale-95 cursor-pointer group`}>
+    <div className={`p-4 bg-white/40 backdrop-blur-md rounded-2xl w-fit ${textColor} transition-transform group-hover:rotate-6`}>
+      <Icon size={24} />
+    </div>
+    <div>
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-1">{label}</p>
+      <h3 className={`text-4xl font-serif font-bold leading-none ${textColor}`}>{value}</h3>
+      <p className={`text-[9px] font-bold mt-3 opacity-60 uppercase tracking-wider ${textColor}`}>{subtext}</p>
+    </div>
+  </div>
+);
 
 const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
   // 1. Keep the Page state
@@ -158,15 +172,14 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
   ];
 
   useEffect(() => {
-    // Change this line to check the prop specifically
-    if (isLoggedIn === false) return; 
-
+    if (!isLoggedIn) return;
     const interval = setInterval(() => {
       const actions = ['Walking', 'Sitting', 'Standing', 'Resting'];
       setCurrentAction(actions[Math.floor(Math.random() * actions.length)]);
     }, 6000);
     return () => clearInterval(interval);
-  }, [isLoggedIn]); // Keep this as the dependency
+  }, [isLoggedIn]);
+
   
   const activateSOS = () => { setIsSOSActive(true); setIsAlerting(true); };
 
@@ -229,7 +242,23 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
 
   const isFamily = user?.role === 'family';
   const cardClass = darkMode ? 'bg-slate-800 border-slate-700 text-slate-100 shadow-none' : 'bg-[#FAF9F6] border-[#2D3E2F]/10 shadow-sm text-[#1C1C1C]';
+  // Calculate dynamic values for cards
+const getMetricValue = (label) => {
+  if (label === 'Steps') {
+    if (wellnessRange === 'Day') return "5,420";
+    if (wellnessRange === 'Week') return "32,100";
+    return "128,400"; // Month
+  }
+  if (label === 'Active effort') {
+    if (wellnessRange === 'Day') return "42m";
+    if (wellnessRange === 'Week') return "5.2h";
+    return "22h";
+  }
+  return label === 'Stability' ? "88%" : "99%"; // Defaults
+};
 
+// Select the correct data set for the chart
+const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week' ? DATA_WEEK : DATA_MONTH);
   return (
     <div className={`flex h-screen overflow-hidden ${darkMode ? 'dark bg-slate-950' : 'bg-[#F0EFE9]'}`}>
       
@@ -237,20 +266,20 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
       <aside className={`w-72 flex flex-col z-20 ${darkMode ? 'bg-slate-900 border-r border-slate-800' : 'bg-[#2D3E2F] shadow-2xl'}`}>
         <div className="p-10 flex flex-col items-center border-b border-white/10">
           {/* The Hover-able Logo Container */}
-  <button 
-    onClick={() => setCurrentPage('Dashboard')} 
-    className="group flex flex-col items-center transition-all duration-500 hover:scale-105 active:scale-95"
-  >
+    <button 
+        onClick={() => setCurrentPage('Dashboard')} 
+        className="group flex flex-col items-center transition-all duration-500 hover:scale-105 active:scale-95"
+        >
     {/* The Shield Icon - Matching Landing Page colors */}
-    <div className="bg-[#FAF9F6]/10 p-4 rounded-[20px] mb-4 text-[#F0EFE9] shadow-inner group-hover:bg-[#FAF9F6]/20 transition-colors">
+      <div className="bg-[#FAF9F6]/10 p-4 rounded-[20px] mb-4 text-[#F0EFE9] shadow-inner group-hover:bg-[#FAF9F6]/20 transition-colors">
       <Shield size={32} />
-    </div>
+      </div>
     
     {/* Text Label - Matching Editorial Style */}
-    <h1 className="text-2xl text-[#F0EFE9] font-serif tracking-tight group-hover:text-white transition-colors">
-      AmbiSense
-    </h1>
-  </button>
+      <h1 className="text-2xl text-[#F0EFE9] font-serif tracking-tight group-hover:text-white transition-colors">
+        AmbiSense
+      </h1>
+    </button>
 
   <span className="text-[10px] text-[#F0EFE9]/40 uppercase tracking-[0.3em] font-bold mt-4 block">
     Secure Gateway
@@ -293,82 +322,212 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
 
         <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar">
           {currentPage === 'Dashboard' && (
-            <div className="space-y-8">
-              <div className={`p-8 rounded-[40px] flex items-center justify-between border shadow-sm transition-all duration-700 ${isAlerting ? 'bg-[#E11D48] text-white border-none' : darkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-400' : 'bg-[#FAF9F6] border-[#2D3E2F]/10 text-[#2D3E2F]'}`}>
-                <div className="flex items-center gap-6">
-                  {isAlerting ? <AlertTriangle size={32} className="animate-bounce" /> : <CheckCircle size={32} />}
-                  <div><h3 className="text-2xl font-serif tracking-tight">{isAlerting ? "Immediate fall alert" : "Security status: secure"}</h3><p className="text-sm opacity-60 font-medium">Monitoring patient movement via YOLOv11.</p></div>
-                </div>
-                {isAlerting && <button onClick={() => { setIsAlerting(false); setIsSOSActive(false); }} className="bg-white px-10 py-4 rounded-full text-[#E11D48] active:scale-95 font-black text-xs uppercase tracking-widest transition-all">Clear alert</button>}
-              </div>
+  <div className="space-y-8 animate-in fade-in duration-700">
+    {/* 1. Security Alert Banner */}
+    <div className={`p-8 rounded-[40px] flex items-center justify-between border shadow-sm transition-all duration-700 ${isAlerting ? 'bg-[#E11D48] text-white border-none' : darkMode ? 'bg-emerald-900/20 border-emerald-800 text-emerald-400' : 'bg-[#FAF9F6] border-[#2D3E2F]/10 text-[#2D3E2F]'}`}>
+      <div className="flex items-center gap-6">
+        {isAlerting ? <AlertTriangle size={32} className="animate-bounce" /> : <CheckCircle size={32} />}
+        <div>
+          <h3 className="text-2xl font-serif tracking-tight">{isAlerting ? "Immediate fall alert" : "Security status: secure"}</h3>
+          <p className="text-sm opacity-60 font-medium">Monitoring patient movement via YOLOv11.</p>
+        </div>
+      </div>
+      {isAlerting && <button onClick={() => { setIsAlerting(false); setIsSOSActive(false); }} className="bg-white px-10 py-4 rounded-full text-[#E11D48] active:scale-95 font-black text-xs uppercase tracking-widest transition-all">Clear alert</button>}
+    </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 bg-[#1C1C1C] rounded-[60px] overflow-hidden relative aspect-video shadow-2xl border border-[#2D3E2F]/10">
-                  <div className="absolute top-8 left-8 z-10 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-3 border border-white/10"><div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div><span className="text-white text-[10px] uppercase font-black tracking-[0.2em]">Live metadata feed</span></div>
-                  <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1200" className={`w-full h-full object-cover transition-all duration-1000 ${isPrivacyMasked ? 'blur-3xl opacity-20' : 'opacity-20 grayscale'}`} alt="View" />
-                  {!isPrivacyMasked && <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100"><circle cx="50" cy="35" r="2.5" fill="#10B981" className="animate-pulse" /><line x1="50" y1="35" x2="50" y2="65" stroke="#10B981" strokeWidth="0.8" /><line x1="50" y1="45" x2="38" y2="58" stroke="#10B981" strokeWidth="0.8" /><line x1="50" y1="45" x2="62" y2="58" stroke="#10B981" strokeWidth="0.8" /></svg>}
-                  <div className="absolute bottom-10 right-10 flex gap-4">
-                    <button onClick={() => setIsPrivacyMasked(!isPrivacyMasked)} className="bg-white/10 p-5 rounded-full text-white backdrop-blur-xl transition-all hover:bg-white/20 border border-white/10">{isPrivacyMasked ? <Eye size={22} /> : <EyeOff size={22} />}</button>
-                    <button onClick={() => setIsAlerting(true)} className="bg-[#E11D48] text-white px-10 py-4 rounded-full transition-all active:scale-95 font-black text-xs uppercase tracking-widest shadow-xl shadow-rose-500/30">Simulate fall</button>
-                  </div>
-                </div>
-                <div className="space-y-8 flex flex-col">
-                 <div className={`p-10 rounded-[50px] border flex flex-col items-center justify-center text-center transition-all duration-500 ${
-                    currentAction === 'Falling' ? 'bg-rose-50 border-rose-200 shadow-xl shadow-rose-500/10' : cardClass
-                  }`}>
-                    <div className={`p-4 rounded-full mb-4 transition-colors duration-500 ${
-                      currentAction === 'Falling' ? 'bg-rose-500 text-white animate-bounce' : 'bg-[#2D3E2F]/5 text-[#2D3E2F]'
-                    }`}>
-                      <ActivityIcon size={24} className={currentAction !== 'Resting' ? 'animate-pulse' : ''} />
-                    </div>
-                    <h4 className="text-[10px] text-[#2D3E2F]/40 uppercase font-black tracking-[0.4em] mb-3 opacity-90 bg-clip-padding">Live Posture</h4>
-                    <span className={`text-4xl font-serif italic transition-colors duration-500 ${currentAction === 'Falling' ? 'text-rose-600' : 'text-[#2D3E2F]'}`}>
-                      {currentAction}
-                    </span>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-30 mt-2">
-                      {currentAction === 'Resting' ? 'Steady State' : 'Movement Active'}
-                    </p>
-                  </div>
+    {/* 2. LIVE VIDEO FEED */}
+    <div className="bg-[#1C1C1C] rounded-[60px] overflow-hidden relative aspect-video shadow-2xl border border-[#2D3E2F]/10">
+      <div className="absolute top-8 left-8 z-10 bg-black/40 backdrop-blur-md px-4 py-2 rounded-full flex items-center gap-3 border border-white/10">
+        <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+        <span className="text-white text-[10px] uppercase font-black tracking-[0.2em]">Live node</span>
+      </div>
+      <img 
+        src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=1600" 
+        className={`w-full h-full object-cover transition-all duration-1000 ${isPrivacyMasked ? 'blur-[120px] opacity-10' : 'grayscale opacity-30'}`} 
+        alt="Feed" 
+      />
+      {!isPrivacyMasked && (
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+          <circle cx="50" cy="35" r="1.5" fill="#10B981" className="animate-pulse" />
+          <path d="M50 35 L50 60 M50 40 L40 55 M50 40 L60 55 M50 60 L42 80 M50 60 L58 80" stroke="#10B981" strokeWidth="0.6" fill="none" strokeDasharray="1,1" />
+        </svg>
+      )}
+      <div className="absolute bottom-8 left-8 right-8 flex justify-between items-center">
+        <div className="bg-white/90 backdrop-blur-2xl p-4 rounded-[25px] flex gap-6 items-center shadow-2xl">
+          <div className="flex flex-col justify-center">
+            <p className="text-[9px] uppercase font-black opacity-30 tracking-[0.1em] leading-none mb-1">State</p>
+            <p className="font-serif italic text-xl text-[#2D3E2F] leading-none">{currentAction}</p>
+          </div>
+          <div className="w-px h-12 bg-[#2D3E2F]/10" />
+          <button onClick={() => setIsPrivacyMasked(!isPrivacyMasked)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#2D3E2F]">
+            {isPrivacyMasked ? <Eye size={22} /> : <EyeOff size={22} />} {isPrivacyMasked ? 'Reveal Stream' : 'Privacy Mask'}
+          </button>
+        </div>
+      </div>
+    </div>
 
-                  <div className={`p-10 rounded-[50px] border flex-1 overflow-hidden ${cardClass}`}>
-                    <div className="flex items-center justify-between mb-8">
-                      <h4 className="text-[10px] text-[#2D3E2F]/40 uppercase font-black tracking-[0.3em]">Regimen</h4>
-                      <button onClick={readScheduleAloud} disabled={isSpeaking} className="p-3 bg-[#2D3E2F]/5 text-[#2D3E2F] rounded-full active:scale-90 transition-all">{isSpeaking ? <Loader2 size={18} className="animate-spin" /> : <Volume2 size={18} />}</button>
-                    </div>
-                    <div className="space-y-3">
-                      {medications.map((m, i) => (
-                        <div key={i} className={`p-4 rounded-[20px] border flex items-center gap-4 transition-all ${m.completed ? (darkMode ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-emerald-50 border-emerald-100') : 'bg-transparent border-[#2D3E2F]/5'}`}>
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${m.completed ? 'bg-emerald-500 text-white' : 'bg-[#2D3E2F]/10 text-[#2D3E2F]'}`}>{m.completed ? <CheckCircle size={14} /> : <Pill size={14} />}</div>
-                          <div><p className={`text-xs font-bold leading-none mb-1`}>{m.med}</p><span className={`text-[9px] uppercase font-bold tracking-widest opacity-40`}>{m.time} • {m.dose}</span></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+    {/* 3. STATS CARDS ROW */}
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+      <SquareStatCard label="Stability" value="94.2%" subtext="Consistent" icon={Activity} bgColor="bg-[#E9EDC9]" />
+      <SquareStatCard label="Daily Steps" value="4,821" subtext="82% Target" icon={TrendingUp} bgColor="bg-[#CCD5AE]" />
+      <SquareStatCard label="Heart Rate" value="72 bpm" subtext="Stable" icon={Heart} bgColor="bg-[#FAEDCD]" />
+      <SquareStatCard label="Active Time" value="6.5h" subtext="Measured" icon={Zap} bgColor="bg-[#D4A373]" textColor="text-white" />
+    </div>
+
+    {/* 4. ANALYTICS GRID (Intensity Trend + Movement Distribution) */}
+    <div className="grid grid-cols-12 gap-10">
+      
+      {/* LEFT: INTENSITY TREND */}
+      <div className="col-span-12 bg-white p-12 rounded-[60px] border border-[#2D3E2F]/5 shadow-sm">
+        <div className="flex justify-between items-center mb-10">
+          <div>
+            <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-1">Density Analytics</h4>
+            <p className="text-2xl font-serif text-[#2D3E2F]">Movement Intensity Trend</p>
+          </div>
+          <BarChart3 size={24} className="opacity-20" />
+        </div>
+        
+        <div className="relative h-64 w-full bg-[#FDFCF9] rounded-3xl border border-[#2D3E2F]/5 p-8 flex items-end gap-3 group">
+          <div className="absolute inset-0 flex flex-col justify-between py-8 px-4 pointer-events-none opacity-[0.03]">
+            {[...Array(5)].map((_, i) => <div key={i} className="w-full h-px bg-[#2D3E2F]" />)}
+          </div>
+          
+          {[25, 40, 30, 65, 50, 85, 55, 70, 35, 95, 60, 45, 75, 90, 45, 35, 60, 80, 100, 65, 50, 35, 55, 25].map((h, i) => (
+            <div key={i} className="flex-1 relative h-full flex items-end">
+              <div 
+                style={{ height: `${h}%` }} 
+                className="w-full bg-[#2D3E2F] rounded-t-lg transition-all duration-500 hover:bg-[#D4A373] shadow-md relative group"
+              >
+                <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 rounded-t-lg" />
               </div>
             </div>
-          )}
+          ))}
+        </div>
+        
+        <div className="flex justify-between mt-6 px-2 text-[9px] font-black uppercase opacity-30 tracking-[0.4em]">
+          <span>12 AM</span><span>6 AM</span><span>12 PM</span><span>6 PM</span><span>Now</span>
+        </div>
+      </div> 
+
+      {/* FULL WIDTH MOVEMENT DISTRIBUTION (PATTERN ANALYSIS) */}
+<div className="col-span-12">
+  <div className="bg-[#2D3E2F] p-12 rounded-[60px] shadow-2xl text-white transition-all">
+    <div className="flex flex-col md:flex-row items-center justify-between gap-12">
+      
+      {/* 1. Title & Description Section (Left Aligned) */}
+      <div className="flex-1">
+        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-3">
+          Pattern Analysis
+        </h4>
+        <h3 className="text-3xl font-serif italic tracking-tight">
+          Movement Distribution
+        </h3>
+        <p className="text-[10px] opacity-30 mt-4 max-w-xs font-bold uppercase tracking-widest leading-relaxed">
+          Daily classification of activity levels based on skeletal tracking nodes.
+        </p>
+      </div>
+
+      {/* 2. Visual Data Section (Right Aligned) */}
+      <div className="flex flex-col sm:flex-row items-center gap-16">
+        
+        {/* The Circular Gauge */}
+        <div className="relative w-40 h-40 shrink-0">
+          <svg className="w-full h-full rotate-[-90deg]">
+            <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="18" />
+            <circle cx="80" cy="80" r="70" fill="none" stroke="#D4A373" strokeWidth="18" strokeDasharray="440" strokeDashoffset="140" strokeLinecap="round" />
+            <circle cx="80" cy="80" r="70" fill="none" stroke="white" strokeWidth="18" strokeDasharray="440" strokeDashoffset="300" strokeLinecap="round" />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-4xl font-bold leading-none">14h</span>
+            <span className="text-[9px] font-black uppercase opacity-40 mt-1">Total</span>
+          </div>
+        </div>
+
+        {/* The Corrected Legend Grid */}
+        <div className="grid grid-cols-1 gap-6 min-w-[150px]">
+          {[
+            { label: 'Resting', color: 'bg-white', val: '45%' }, 
+            { label: 'Active', color: 'bg-[#D4A373]', val: '30%' }, 
+            { label: 'Static', color: 'bg-white/10', val: '25%' }
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-4">
+              <div className={`w-2.5 h-2.5 rounded-full ${item.color} shrink-0 shadow-[0_0_10px_rgba(255,255,255,0.1)]`} />
+              <div className="flex flex-col justify-center">
+                <span className="text-[9px] font-black uppercase tracking-widest opacity-40 leading-none mb-1">
+                  {item.label}
+                </span>
+                <span className="text-xl font-bold leading-none">
+                  {item.val}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
           {currentPage === 'Wellness Stats' && (
-            <div className="space-y-10 animate-in fade-in duration-700">
-              <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-serif tracking-tight">Wellness Center</h1>
-                <div className={`p-1 rounded-full border flex ${cardClass}`}>
-                  {['Day', 'Week', 'Month'].map(r => (<button key={r} onClick={() => setWellnessRange(r)} className={`px-10 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${wellnessRange === r ? 'bg-[#2D3E2F] text-[#F0EFE9]' : 'text-[#2D3E2F]/40 hover:bg-[#2D3E2F]/5'}`}>{r}</button>))}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <MetricCard label="Steps" value={wellnessRange === 'Day' ? "5,420" : "32,100"} trend="+5.2%" darkMode={darkMode} />
-                <MetricCard label="Stability" value="88%" trend="Secure" darkMode={darkMode} />
-                <MetricCard label="Active effort" value="42m" trend="+12%" darkMode={darkMode} />
-                <MetricCard label="Sync health" value="99%" trend="Secure" darkMode={darkMode} />
-              </div>
-              <div className={`p-12 rounded-[60px] border ${cardClass}`}>
-                <h3 className="text-xl font-serif italic mb-10 tracking-tight">Intensity Trend</h3>
-                <div className="h-[400px]"><ResponsiveContainer width="100%" height="100%">{wellnessRange === 'Day' ? <AreaChart data={DATA_DAY}><defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#2D3E2F" stopOpacity={0.1}/><stop offset="95%" stopColor="#2D3E2F" stopOpacity={0}/></linearGradient></defs><CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} /><XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} /><Area type="monotone" dataKey="intensity" stroke="#2D3E2F" strokeWidth={3} fillOpacity={1} fill="url(#c)" /></AreaChart> : <BarChart data={DATA_WEEK}><CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} /><XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} /><Bar dataKey="steps" fill="#2D3E2F" radius={[10, 10, 0, 0]} barSize={40} /></BarChart>}</ResponsiveContainer></div>
-              </div>
-            </div>
+  <div className="space-y-10 animate-in fade-in duration-700">
+    <div className="flex items-center justify-between">
+      <h1 className="text-3xl font-serif tracking-tight">Wellness Center</h1>
+      <div className={`p-1 rounded-full border flex ${cardClass}`}>
+        {['Day', 'Week', 'Month'].map(r => (
+          <button 
+            key={r} 
+            onClick={() => setWellnessRange(r)} 
+            className={`px-10 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${wellnessRange === r ? 'bg-[#2D3E2F] text-[#F0EFE9]' : 'text-[#2D3E2F]/40 hover:bg-[#2D3E2F]/5'}`}
+          >
+            {r}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    {/* Dynamic Cards */}
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <MetricCard label="Steps" value={getMetricValue('Steps')} trend="+5.2%" darkMode={darkMode} />
+      <MetricCard label="Stability" value={getMetricValue('Stability')} trend="Secure" darkMode={darkMode} />
+      <MetricCard label="Active effort" value={getMetricValue('Active effort')} trend="+12%" darkMode={darkMode} />
+      <MetricCard label="Sync health" value={getMetricValue('Sync health')} trend="Secure" darkMode={darkMode} />
+    </div>
+
+    {/* Dynamic Graph */}
+    <div className={`p-12 rounded-[60px] border ${cardClass}`}>
+      <h3 className="text-xl font-serif italic mb-10 tracking-tight">{wellnessRange} Intensity Trend</h3>
+      <div className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          {wellnessRange === 'Day' ? (
+            <AreaChart data={chartData}>
+              <defs>
+                <linearGradient id="c" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2D3E2F" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#2D3E2F" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} />
+              <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} />
+              <Tooltip />
+              <Area type="monotone" dataKey="intensity" stroke="#2D3E2F" strokeWidth={3} fillOpacity={1} fill="url(#c)" />
+            </AreaChart>
+          ) : (
+            <BarChart data={chartData}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} />
+              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} />
+              <Tooltip />
+              <Bar dataKey={wellnessRange === 'Month' ? 'steps' : 'steps'} fill="#2D3E2F" radius={[10, 10, 0, 0]} barSize={40} />
+            </BarChart>
           )}
+        </ResponsiveContainer>
+      </div>
+    </div>
+  </div>
+)}
 
           {currentPage === 'Medical Records' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
@@ -549,4 +708,3 @@ function ToggleRow({ label, active, onClick, disabled, darkMode }) {
     </div>
   );
 }
-
