@@ -8,6 +8,7 @@ import {
   ArrowUpRight, ShieldCheck, Lock, Fingerprint, ChevronRight, Menu, Plus,
   TrendingUp, Heart, Zap, BarChart3
 } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, 
   ResponsiveContainer, AreaChart, Area, BarChart, Bar
@@ -353,10 +354,10 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         </svg>
       )}
       <div className="absolute bottom-8 left-8 right-8 flex justify-between items-center">
-        <div className="bg-white/90 backdrop-blur-2xl p-4 rounded-[25px] flex gap-6 items-center shadow-2xl">
-          <div className="flex flex-col justify-center">
-            <p className="text-[9px] uppercase font-black opacity-30 tracking-[0.1em] leading-none mb-1">State</p>
-            <p className="font-serif italic text-xl text-[#2D3E2F] leading-none">{currentAction}</p>
+        <div className="bg-white/95 backdrop-blur-2xl p-6 rounded-[35px] flex gap-10 items-center shadow-2xl">
+          <div>
+            <p className="text-[9px] uppercase font-black opacity-30 tracking-[0.2em]">State</p>
+            <p className="font-serif italic text-3xl text-[#2D3E2F]">{currentAction}</p>
           </div>
           <div className="w-px h-12 bg-[#2D3E2F]/10" />
           <button onClick={() => setIsPrivacyMasked(!isPrivacyMasked)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#2D3E2F]">
@@ -375,7 +376,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
     </div>
 
     {/* 4. ANALYTICS GRID (Intensity Trend + Movement Distribution) */}
-    <div className="grid grid-cols-12 gap-10">
+    <div className="grid grid-cols-12 gap-8">
       
       {/* LEFT: INTENSITY TREND */}
       <div className="col-span-12 bg-white p-12 rounded-[60px] border border-[#2D3E2F]/5 shadow-sm">
@@ -409,62 +410,33 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         </div>
       </div> 
 
-      {/* FULL WIDTH MOVEMENT DISTRIBUTION (PATTERN ANALYSIS) */}
-<div className="col-span-12">
-  <div className="bg-[#2D3E2F] p-12 rounded-[60px] shadow-2xl text-white transition-all">
-    <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-      
-      {/* 1. Title & Description Section (Left Aligned) */}
-      <div className="flex-1">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-3">
-          Pattern Analysis
-        </h4>
-        <h3 className="text-3xl font-serif italic tracking-tight">
-          Movement Distribution
-        </h3>
-        <p className="text-[10px] opacity-30 mt-4 max-w-xs font-bold uppercase tracking-widest leading-relaxed">
-          Daily classification of activity levels based on skeletal tracking nodes.
-        </p>
-      </div>
-
-      {/* 2. Visual Data Section (Right Aligned) */}
-      <div className="flex flex-col sm:flex-row items-center gap-16">
-        
-        {/* The Circular Gauge */}
-        <div className="relative w-40 h-40 shrink-0">
-          <svg className="w-full h-full rotate-[-90deg]">
-            <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="18" />
-            <circle cx="80" cy="80" r="70" fill="none" stroke="#D4A373" strokeWidth="18" strokeDasharray="440" strokeDashoffset="140" strokeLinecap="round" />
-            <circle cx="80" cy="80" r="70" fill="none" stroke="white" strokeWidth="18" strokeDasharray="440" strokeDashoffset="300" strokeLinecap="round" />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-4xl font-bold leading-none">14h</span>
-            <span className="text-[9px] font-black uppercase opacity-40 mt-1">Total</span>
-          </div>
-        </div>
-
-        {/* The Corrected Legend Grid */}
-        <div className="grid grid-cols-1 gap-6 min-w-[150px]">
-          {[
-            { label: 'Resting', color: 'bg-white', val: '45%' }, 
-            { label: 'Active', color: 'bg-[#D4A373]', val: '30%' }, 
-            { label: 'Static', color: 'bg-white/10', val: '25%' }
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className={`w-2.5 h-2.5 rounded-full ${item.color} shrink-0 shadow-[0_0_10px_rgba(255,255,255,0.1)]`} />
-              <div className="flex flex-col justify-center">
-                <span className="text-[9px] font-black uppercase tracking-widest opacity-40 leading-none mb-1">
-                  {item.label}
-                </span>
-                <span className="text-xl font-bold leading-none">
-                  {item.val}
-                </span>
+      {/* RIGHT: MOVEMENT DISTRIBUTION */}
+      <div className="col-span-12 lg:col-span-12 space-y-8">
+        <div className="bg-[#2D3E2F] p-10 rounded-[60px] shadow-2xl text-white h-full flex flex-col justify-center">
+          <h4 className="text-[10px] font-black uppercase tracking-widest opacity-40 mb-10 text-center">Movement Distribution</h4>
+          <div className="flex items-center justify-center gap-10">
+            <div className="relative w-36 h-36">
+              <svg className="w-full h-full rotate-[-90deg]">
+                <circle cx="72" cy="72" r="64" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="16" />
+                <circle cx="72" cy="72" r="64" fill="none" stroke="#D4A373" strokeWidth="16" strokeDasharray="402" strokeDashoffset="140" strokeLinecap="round" />
+                <circle cx="72" cy="72" r="64" fill="none" stroke="white" strokeWidth="16" strokeDasharray="402" strokeDashoffset="300" strokeLinecap="round" />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-3xl font-bold">14h</span>
+                <span className="text-[9px] font-black uppercase opacity-40">Total</span>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-
+            <div className="space-y-4">
+              {[{ label: 'Rest', color: 'bg-white', val: '45%' }, { label: 'Active', color: 'bg-[#D4A373]', val: '30%' }, { label: 'Static', color: 'bg-white/10', val: '25%' }].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                  <div className="flex flex-col">
+                    <span className="text-[9px] font-black uppercase tracking-widest opacity-40 leading-none">{item.label}</span>
+                    <span className="text-sm font-bold">{item.val}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -499,7 +471,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 
     {/* Dynamic Graph */}
     <div className={`p-12 rounded-[60px] border ${cardClass}`}>
-      <h3 className="text-xl font-serif italic mb-10 tracking-tight">{wellnessRange} Intensity Trend</h3>
+      <h3 className="text-xl font-serif mb-14 tracking-tight">{wellnessRange} Intensity Trend</h3>
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
           {wellnessRange === 'Day' ? (
@@ -532,13 +504,16 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
           {currentPage === 'Medical Records' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
               <div className={`p-12 rounded-[50px] border ${cardClass}`}>
-                <h3 className="text-2xl font-serif mb-10 flex items-center gap-4 italic tracking-tight"><Stethoscope size={28} className="text-[#2D3E2F]" /> Clinical Logs</h3>
+                <h3 className="text-2xl font-serif mb-10 flex items-center gap-4 tracking-tight"><Stethoscope size={28} className="text-[#2D3E2F]" /> Clinical Logs</h3>
                 {!isFamily ? (<div className="space-y-6 mb-12"><textarea value={noteInput} onChange={(e) => setNoteInput(e.target.value)} placeholder="Enter clinical observation..." className={`w-full p-8 rounded-[35px] outline-none border focus:ring-4 focus:ring-[#2D3E2F]/5 transition-all text-sm placeholder-[#2D3E2F]/20 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-[#2D3E2F]/5 border-[#2D3E2F]/5'}`} rows="4" /><button onClick={handleSaveNote} className="w-full bg-[#2D3E2F] text-[#F0EFE9] py-6 rounded-full text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">Submit Medical Record</button></div>) : (<div className="p-6 bg-amber-50 border border-amber-200 rounded-[25px] text-amber-800 text-[10px] font-black uppercase tracking-widest mb-10 flex items-center gap-3"><Shield size={20} /> Encrypted View Mode</div>)}
                 <div className="space-y-4">{clinicalNotes.map(n => <div key={n.id} className={`p-8 rounded-[35px] border ${cardClass}`}><div className="flex justify-between mb-4 text-[10px] font-black uppercase tracking-widest opacity-30"><span>{n.author}</span><span>{n.date}</span></div>{editingNoteId === n.id ? (<div className="space-y-4"><textarea value={editValue} onChange={(e) => setEditValue(e.target.value)} className="w-full p-6 rounded-2xl border bg-transparent text-sm outline-none" /><div className="flex gap-2"><button onClick={saveEdit} className="px-6 py-2 bg-[#2D3E2F] text-white rounded-full text-[10px] font-black uppercase">Save</button><button onClick={() => setEditingNoteId(null)} className="px-6 py-2 bg-slate-100 rounded-full text-[10px] font-black uppercase tracking-widest">Exit</button></div></div>) : (<><p className="text-sm leading-relaxed mb-6">{n.text}</p>{!isFamily && (<div className="flex gap-6 border-t border-[#2D3E2F]/5 pt-5"><button onClick={() => startEdit(n)} className="text-[#2D3E2F]/30 hover:text-[#2D3E2F] transition-all"><Edit3 size={16} /></button><button onClick={() => deleteNote(n.id)} className="text-[#2D3E2F]/30 hover:text-rose-500 transition-all"><Trash2 size={16} /></button></div>)}</>)}</div>)}</div>
               </div>
               <div className="space-y-12">
-                <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}><h3 className="text-2xl font-serif mb-6 flex items-center gap-4 italic tracking-tight"><Sparkles size={28}/> Research Vault</h3><div className="relative mb-10"><input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." /><button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">{isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</button></div>{researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal ">"{researchOutput}"</div>}</div>
-                <div className={`p-12 rounded-[50px] border ${cardClass}`}><div className="flex items-center justify-between mb-8"><h3 className="text-2xl font-serif italic tracking-tight">AI Insights ✨</h3><button onClick={handleSummary} disabled={isGeneratingSummary} className="p-4 bg-[#2D3E2F] text-[#F0EFE9] rounded-full hover:scale-110 active:scale-90 transition-all shadow-xl">{isGeneratingSummary ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}</button></div><div className={`p-8 rounded-[30px] text-sm leading-relaxed italic ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5 border border-[#2D3E2F]/5'}`}>"{aiSummary}"</div></div>
+                <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}><h3 className="text-2xl font-serif mb-6 flex items-center gap-4 tracking-tight"><Sparkles size={28}/> Research Vault</h3><div className="relative mb-10"><input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." /><button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">{isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</button></div>{researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal ">"{researchOutput}"</div>}</div>
+                <div className={`p-12 rounded-[50px] border ${cardClass}`}><div className="flex items-center justify-between mb-8"><h3 className="text-2xl font-serif tracking-tight"><h2 className="flex items-center gap-2 text-2xl font-serif">
+  <Brain className="w-6 h-6 text-black" /> 
+  AI Insights
+</h2></h3><button onClick={handleSummary} disabled={isGeneratingSummary} className="p-4 bg-[#2D3E2F] text-[#F0EFE9] rounded-full hover:scale-110 active:scale-90 transition-all shadow-xl">{isGeneratingSummary ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}</button></div><div className={`p-8 rounded-[30px] text-sm leading-relaxed italic ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5 border border-[#2D3E2F]/5'}`}>"{aiSummary}"</div></div>
               </div>
             </div>
           )}
@@ -689,7 +664,7 @@ function MetricCard({ label, value, trend, darkMode }) {
     <div className={`p-10 rounded-[50px] border shadow-sm flex flex-col justify-center transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-[#FAF9F6] border-[#2D3E2F]/10'}`}>
       <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 opacity-40">{label}</p>
       <div className="flex items-end justify-between font-normal">
-        <h3 className="text-4xl font-serif italic text-[#2D3E2F] tracking-tight">{value}</h3>
+        <h3 className="text-4xl font-serif text-[#2D3E2F] tracking-tight">{value}</h3>
         <div className={`text-[9px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest ${trend.includes('+') || trend === 'Secure' ? 'bg-[#2D3E2F]/5 text-[#2D3E2F]' : 'bg-rose-500/10 text-rose-600'}`}>{trend}</div>
       </div>
     </div>
