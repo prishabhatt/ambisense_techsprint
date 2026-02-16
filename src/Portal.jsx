@@ -272,9 +272,9 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         className="group flex flex-col items-center transition-all duration-500 hover:scale-105 active:scale-95"
         >
     {/* The Shield Icon - Matching Landing Page colors */}
-      <div className="bg-[#FAF9F6]/10 p-4 rounded-[20px] mb-4 text-[#F0EFE9] shadow-inner group-hover:bg-[#FAF9F6]/20 transition-colors">
-      <Shield size={32} />
-      </div>
+      <div className="w-10 h-10 bg-[#2D3E2F] rounded-full flex items-center justify-center text-white group-hover:rotate-12 transition-transform">
+            <ShieldCheck size={20} />
+          </div>
     
     {/* Text Label - Matching Editorial Style */}
       <h1 className="text-2xl text-[#F0EFE9] font-serif tracking-tight group-hover:text-white transition-colors">
