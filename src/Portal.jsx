@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { 
   Shield, LayoutDashboard, Activity, Stethoscope, User, LogOut, 
@@ -6,7 +7,8 @@ import {
   Loader2, Settings, Info, Activity as ActivityIcon,
   Pill, HeartPulse, UserCircle, Trash2, Edit3, Sun, Moon, Thermometer, Wind, X, 
   ArrowUpRight, ShieldCheck, Lock, Fingerprint, ChevronRight, Menu, Plus,
-  TrendingUp, Heart, Zap, BarChart3
+  TrendingUp, Heart, Zap, BarChart3 , Wifi, Phone, MapPin, Radio,
+  Cpu, HardDrive, Smartphone, Camera, Database, FileText, Map, Languages
 } from 'lucide-react';
 import { Brain } from 'lucide-react';
 import { 
@@ -128,8 +130,53 @@ const SquareStatCard = ({ label, value, subtext, icon: Icon, bgColor, textColor 
     </div>
   </div>
 );
+// Dossier Item
+const DossierItem = ({ label, value, sub }) => (
+  <div className="space-y-3 border-l border-[#2D3E2F]/10 pl-8 group hover:border-[#2D3E2F]/30 transition-all">
+    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#2D3E2F]/50 leading-none">
+      {label}
+    </p>
+    <p className="text-3xl font-serif text-[#1C1C1C] tracking-tight leading-tight">
+      {value}
+    </p>
+    <p className="text-[14px] font-medium text-[#2D3E2F]/50 font-serif">
+      {sub}
+    </p>
+  </div>
+);
+
+// Contact Card 
+const ContactCard = ({ role, name, sub, initial }) => (
+  <div className="p-8 rounded-[40px] border border-[#2D3E2F]/5 bg-white/50 flex items-center gap-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+    <div className="w-16 h-16 rounded-3xl bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-center text-2xl font-serif shadow-lg">
+      {initial}
+    </div>
+    <div className="space-y-1">
+      <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#2D3E2F]/50 mb-1">{role}</p>
+      <p className="text-xl font-serif font-bold text-[#1C1C1C] leading-tight">{name}</p>
+      <p className="text-xs text-[#2D3E2F]/50 font-serif ">{sub}</p>
+    </div>
+  </div>
+);
 
 const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
+const [showUpdateModal, setShowUpdateModal] = useState(false);
+const [userData, setUserData] = useState({
+  name: "John Doe",
+  age: 78,
+  bloodType: "O-",
+  location: "Ahmedabad, IN",
+  initials: "JD"
+});
+
+
+// Temporary state for the form
+const [formData, setFormData] = useState({ ...userData });
+
+const handleUpdate = () => {
+  setUserData({ ...formData, initials: formData.name.split(' ').map(n => n[0]).join('').toUpperCase() });
+  setShowUpdateModal(false);
+};
   // 1. Keep the Page state
   const [currentPage, setCurrentPage] = useState('Dashboard'); 
   
@@ -182,7 +229,7 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
   }, [isLoggedIn]);
 
   
-  const activateSOS = () => { setIsSOSActive(true); setIsAlerting(true); };
+  
 
   const readScheduleAloud = async () => {
     if (isSpeaking) return;
@@ -244,7 +291,7 @@ const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
   const isFamily = user?.role === 'family';
   const cardClass = darkMode ? 'bg-slate-800 border-slate-700 text-slate-100 shadow-none' : 'bg-[#FAF9F6] border-[#2D3E2F]/10 shadow-sm text-[#1C1C1C]';
   // Calculate dynamic values for cards
-const getMetricValue = (label) => {
+  const getMetricValue = (label) => {
   if (label === 'Steps') {
     if (wellnessRange === 'Day') return "5,420";
     if (wellnessRange === 'Week') return "32,100";
@@ -354,13 +401,13 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         </svg>
       )}
       <div className="absolute bottom-8 left-8 right-8 flex justify-between items-center">
-        <div className="bg-white/95 backdrop-blur-2xl p-6 rounded-[35px] flex gap-10 items-center shadow-2xl">
+        <div className="bg-white/90 backdrop-blur-2xl p-6 rounded-[35px] flex gap-6 items-center shadow-2xl">
           <div>
-            <p className="text-[9px] uppercase font-black opacity-30 tracking-[0.2em]">State</p>
-            <p className="font-serif italic text-3xl text-[#2D3E2F]">{currentAction}</p>
+            <p className="text-[9px] uppercase font-black opacity-30 tracking-[0.1em] leading-none mb-1">State</p>
+            <p className="font-serif italic text-xl text-[#2D3E2F] leading-none">{currentAction}</p>
           </div>
-          <div className="w-px h-12 bg-[#2D3E2F]/10" />
-          <button onClick={() => setIsPrivacyMasked(!isPrivacyMasked)} className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.2em] text-[#2D3E2F]">
+          <div className="w-px h-8 bg-[#2D3E2F]/10" />
+          <button onClick={() => setIsPrivacyMasked(!isPrivacyMasked)} className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.1em] text-[#2D3E2F] leading-none">
             {isPrivacyMasked ? <Eye size={22} /> : <EyeOff size={22} />} {isPrivacyMasked ? 'Reveal Stream' : 'Privacy Mask'}
           </button>
         </div>
@@ -519,31 +566,183 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
           )}
 
           {currentPage === 'Profile' && (
-            <div className="max-w-4xl mx-auto space-y-12 animate-in slide-in-from-bottom-12 duration-700">
-              <div className={`p-16 rounded-[60px] border shadow-sm flex items-center gap-16 group ${cardClass}`}>
-                <div className="w-48 h-48 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-center text-7xl font-serif shadow-2xl transition-transform duration-700 group-hover:scale-[1.02]">JD</div>
-                <div className="space-y-4"><h1 className="text-6xl font-serif tracking-tighter text-[#1C1C1C]">John Doe</h1><p className="text-[#2D3E2F]/40 text-xl font-serif italic flex items-center gap-4">78 years • Blood: O- • Serial: EG-221</p><div className="flex gap-4 pt-6"><span className="px-8 py-3 bg-emerald-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-emerald-500/20">Secure</span><span className="px-8 py-3 bg-[#2D3E2F] text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg shadow-[#2D3E2F]/20">Premium</span></div></div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className={`p-12 rounded-[50px] border space-y-10 ${cardClass}`}><h3 className="text-2xl font-serif italic flex items-center gap-4"><Settings size={24} className="text-[#2D3E2F]" /> System Integrity</h3>
-                  <div className="space-y-6">
-                    <ToggleRow label="YOLOv11 tracking engine" active={systemIntegrity.tracking} onClick={!isFamily ? () => setSystemIntegrity({...systemIntegrity, tracking: !systemIntegrity.tracking}) : undefined} disabled={isFamily} darkMode={darkMode} />
-                    <ToggleRow label="Automated alert dispatch" active={systemIntegrity.alerts} onClick={!isFamily ? () => setSystemIntegrity({...systemIntegrity, alerts: !systemIntegrity.alerts}) : undefined} disabled={isFamily} darkMode={darkMode} />
-                  </div>
-                </div>
-                <div className={`p-12 rounded-[50px] border flex flex-col justify-between ${cardClass}`}>
-                  <div><h3 className="text-2xl font-serif mb-4 italic">SOS Broadcast</h3><p className="text-[11px] font-bold text-[#2D3E2F]/40 leading-relaxed mb-12 uppercase tracking-widest">Signal triggers priority dispatch to family responders and EMS units.</p></div>
-                  <button onClick={activateSOS} className="w-full bg-[#E11D48] text-white py-8 rounded-full text-xl font-black uppercase tracking-[0.2em] shadow-2xl shadow-rose-500/30 active:scale-95 transition-all flex items-center justify-center gap-6 border-4 border-rose-300 animate-pulse-slow">
-                    <Send size={32} /> Activate SOS
-                  </button>
-                </div>
-              </div>
+            <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
+              
+              {/* SECTION 1: THE IDENTITY HEADER */}
+              
+<div className={`relative overflow-hidden p-12 rounded-[60px] border shadow-2xl flex flex-col md:flex-row items-center gap-12 group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#2D3E2F]/10'}`}>
+  <div className="absolute top-0 right-0 w-64 h-64 bg-[#2D3E2F]/5 rounded-full -translate-y-20 translate-x-20 transition-transform group-hover:scale-110 duration-700" />
+  
+  <div className="relative">
+    <div className="w-56 h-56 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-center text-8xl font-serif shadow-2xl relative z-10 transition-transform duration-500 group-hover:rotate-3">
+      {userData.initials}
+    </div>
+    <div className="absolute -inset-4 border-2 border-dashed border-[#2D3E2F]/20 rounded-[60px] animate-[spin_20s_linear_infinite] pointer-events-none" />
+    <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-emerald-500 rounded-full border-8 border-white flex items-center justify-center text-white shadow-xl z-20">
+      <ShieldCheck size={24} />
+    </div>
+  </div>
+
+  <div className="flex-1 space-y-6 text-center md:text-left relative z-10">
+    <div>
+      <h1 className="text-7xl font-serif tracking-tighter text-[#1C1C1C] leading-none">{userData.name}</h1>
+      <p className="text-[#2D3E2F]/50 text-xl font-serif italic mt-3 flex items-center justify-center md:justify-start gap-3">
+        {userData.age} years <span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> Blood Type {userData.bloodType} <span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> {userData.location}
+      </p>
+    </div>
+
+    <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-4">
+      {/* TRIGGER MODAL */}
+      <button 
+        onClick={() => { setFormData({...userData}); setShowUpdateModal(true); }}
+        className="flex items-center gap-3 px-10 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#2D3E2F]/20"
+      >
+        <Edit3 size={18} /> Update Profile
+      </button>
+      <button className="flex items-center gap-3 px-10 py-5 bg-white border border-[#2D3E2F]/10 text-[#2D3E2F] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#F3F1E9] transition-all">
+        <Plus size={18} /> Add Contact
+      </button>
+    </div>
+  </div>
+</div>
+
+              {/* SECTION 2: VERTICAL STACKED SECTIONS */}
+              <div className="flex flex-col gap-12 max-w-5xl mx-auto">
+  
+              {/* BIOMETRIC DOSSIER - Full Width Section */}
+              <div className={`p-16 rounded-[60px] border shadow-sm flex flex-col gap-12 ${cardClass}`}>
+              <div className="flex justify-between items-end border-b border-[#2D3E2F]/15 pb-8">
+              <div>
+              <h3 className="text-3xl font-serif flex items-center gap-4 text-[#2D3E2F]">
+              <Heart size={28} strokeWidth={1.5} /> Biometric Dossier
+              </h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-2 ml-12">Vital Signs Baseline</p>
+            </div>
+            <button className="text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 flex items-center gap-2 px-6 py-3 border border-[#2D3E2F]/20 rounded-full transition-all">
+            <FileText size={14} /> Full Export
+            </button>
+            </div>
+
+    {/* Refined Metric Grid with Better Spacing */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-12">
+      <DossierItem label="Resting Heart Rate" value="72 BPM" sub="Last check: 2h ago" />
+      <DossierItem label="Blood Pressure" value="122/78" sub="Category: Normal" />
+      <DossierItem label="SpO2 Level" value="98%" sub="Stable Baseline" />
+      <DossierItem label="Height / Weight" value="174 cm / 68 kg" sub="BMI: 22.5 (Healthy)" />
+      <DossierItem label="Blood Glucose" value="94 mg/dL" sub="Fasting Average" />
+      <DossierItem label="Daily Calorie Goal" value="1,850 kcal" sub="Measured Intake" />
+    </div>
+
+    {/* Tags Section */}
+    <div className="p-10 rounded-[45px] bg-[#2D3E2F]/5 border border-[#2D3E2F]/5">
+      <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6">Known Pathologies & Clinical Alerts</p>
+      <div className="flex flex-wrap gap-4">
+        {['Type 2 Diabetes', 'Penicillin Allergy', 'Mild Osteoporosis', 'Hypertension'].map(tag => (
+          <span key={tag} className="px-6 py-3 bg-white border border-[#2D3E2F]/10 rounded-full text-[14px] font-bold text-[#2D3E2F] shadow-sm">
+            {tag}
+          </span>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {/* CLINICAL CIRCLE - Full Width Section */}
+  <div className={`p-16 rounded-[60px] border flex flex-col gap-10 ${cardClass}`}>
+    <div className="border-b border-[#2D3E2F]/15 pb-8">
+      <h3 className="text-3xl font-serif flex items-center gap-4 text-[#2D3E2F]">
+        <UserCircle size={28} strokeWidth={1.5} className="opacity-40" /> Clinical Circle
+      </h3>
+      <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-2 ml-12">Verified Care Team Nodes</p>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <ContactCard role="Primary Caregiver" name="Prisha" sub="MD Candidate • GMERS" initial="A" />
+      <ContactCard role="Attending Physician" name="Dr. Arya Shah" sub="Cardiologist • Apollo" initial="S" />
+      <ContactCard role="Emergency Contact" name="Family Line" sub="Verified Node" initial="F" />
+    </div>
+
+    {/* Facility Badge */}
+    <div className="mt-6 p-8 rounded-[40px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-between shadow-2xl shadow-[#2D3E2F]/20">
+      <div className="flex items-center gap-6">
+        <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-md">
+          <MapPin size={24} className="text-[#F0EFE9]" />
+        </div>
+        <div>
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 mb-1">Preferred Medical Facility</p>
+          <p className="text-xl font-serif italic">Sterling Hospital, Ahmedabad</p>
+        </div>
+      </div>
+      <ArrowUpRight className="opacity-40" size={24} />
+    </div>
+  </div>
+</div>
             </div>
           )}
+          {showUpdateModal && (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#2D3E2F]/20 backdrop-blur-md animate-in fade-in duration-300">
+    <div className={`w-full max-w-xl p-12 rounded-[50px] border shadow-2xl ${cardClass} space-y-8 animate-in zoom-in-95 duration-300`}>
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-serif italic text-[#2D3E2F]">Edit Medical Identity</h2>
+        <button onClick={() => setShowUpdateModal(false)} className="p-2 opacity-30 hover:opacity-100 transition-opacity"><X size={24} /></button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-6">
+        <div className="col-span-2 space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Full Name</label>
+          <input 
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/5"
+            value={formData.name}
+            onChange={(e) => setFormData({...formData, name: e.target.value})}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Age</label>
+          <input 
+            type="number"
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
+            value={formData.age}
+            onChange={(e) => setFormData({...formData, age: e.target.value})}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Blood Type</label>
+          <select 
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none appearance-none"
+            value={formData.bloodType}
+            onChange={(e) => setFormData({...formData, bloodType: e.target.value})}
+          >
+            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(t => <option key={t} value={t}>{t}</option>)}
+          </select>
+        </div>
+        <div className="col-span-2 space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Location</label>
+          <input 
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
+            value={formData.location}
+            onChange={(e) => setFormData({...formData, location: e.target.value})}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4 pt-6">
+        <button 
+          onClick={handleUpdate}
+          className="flex-1 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-[#2D3E2F]/20 hover:scale-[1.02] active:scale-95 transition-all"
+        >
+          Save Changes
+        </button>
+        <button 
+          onClick={() => setShowUpdateModal(false)}
+          className="px-10 py-5 bg-white border border-[#2D3E2F]/10 text-[#2D3E2F] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 transition-all"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
         </div>
       </main>
-
-      {isSOSActive && (<div className="fixed inset-0 z-[100] bg-[#2D3E2F]/90 backdrop-blur-2xl flex items-center justify-center p-12 animate-in fade-in duration-500"><div className="bg-[#FAF9F6] p-16 rounded-[60px] text-center max-w-xl border border-white/10 shadow-2xl"><div className="bg-rose-500/10 p-10 rounded-full w-fit mx-auto mb-10 animate-bounce"><AlertTriangle size={80} className="text-[#E11D48]" /></div><h1 className="text-5xl font-serif text-[#1C1C1C] mb-4 tracking-tighter">Protocol Activated</h1><p className="text-[#1C1C1C]/50 text-sm mb-12 uppercase font-black tracking-widest leading-loose">Dispatch in progress. Maintain voice contact.</p><button onClick={() => { setIsSOSActive(false); setIsAlerting(false); }} className="w-full bg-[#1C1C1C] text-white py-7 rounded-full text-xs font-black uppercase tracking-[0.3em] active:scale-95 transition-all shadow-2xl">Abort Signal</button></div></div>)}
     </div>
   );
 }
