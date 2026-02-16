@@ -160,13 +160,39 @@ const ContactCard = ({ role, name, sub, initial }) => (
 );
 
 const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
+// Initial care team data
+const [contacts, setContacts] = useState([
+  { id: 1, role: "Primary Caregiver", name: "Prisha", sub: "MD Candidate • GMERS", initial: "P" },
+  { id: 2, role: "Attending Physician", name: "Dr. Arya Shah", sub: "Cardiologist • Apollo", initial: "A" },
+  { id: 3, role: "Emergency Contact", name: "Family Line", sub: "Verified Node", initial: "F" }
+]);
+
+const [showContactModal, setShowContactModal] = useState(false);
+const [newContact, setNewContact] = useState({ role: '', name: '', sub: '' });
+
+const handleAddContact = () => {
+  if (!newContact.name || !newContact.role) return;
+  const contactNode = {
+    id: Date.now(),
+    ...newContact,
+    initial: newContact.name.charAt(0).toUpperCase()
+  };
+  setContacts([...contacts, contactNode]);
+  setShowContactModal(false);
+  setNewContact({ role: '', name: '', sub: '' });
+};
+
+const deleteContact = (id) => {
+  setContacts(contacts.filter(c => c.id !== id));
+};
 const [showUpdateModal, setShowUpdateModal] = useState(false);
 const [userData, setUserData] = useState({
   name: "John Doe",
   age: 78,
   bloodType: "O-",
   location: "Ahmedabad, IN",
-  initials: "JD"
+  initials: "JD" , 
+  photo: null
 });
 
 
@@ -364,11 +390,20 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
               )}
             </div>
             <div className="h-8 w-[1px] bg-[#2D3E2F]/10"></div>
-            <button onClick={() => setCurrentPage('Profile')} className="w-10 h-10 rounded-full bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-center text-xs font-bold">JD</button>
-          </div>
+            <button 
+  onClick={() => setCurrentPage('Profile')} 
+  className="w-10 h-10 rounded-full bg-[#2D3E2F] overflow-hidden flex items-center justify-center text-[10px] font-black tracking-tighter"
+>
+  {userData.photo ? (
+    <img src={userData.photo} alt="User" className="w-full h-full object-cover" />
+  ) : (
+    <span className="text-[#F0EFE9] uppercase">{userData.initials}</span>
+  )}
+</button>
+            </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar">
+        <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar ">
           {currentPage === 'Dashboard' && (
   <div className="space-y-8 animate-in fade-in duration-700">
     {/* 1. Security Alert Banner */}
@@ -570,13 +605,23 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
               
               {/* SECTION 1: THE IDENTITY HEADER */}
               
-<div className={`relative overflow-hidden p-12 rounded-[60px] border shadow-2xl flex flex-col md:flex-row items-center gap-12 group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#2D3E2F]/10'}`}>
-  <div className="absolute top-0 right-0 w-64 h-64 bg-[#2D3E2F]/5 rounded-full -translate-y-20 translate-x-20 transition-transform group-hover:scale-110 duration-700" />
+              <div className={`relative overflow-hidden p-12 rounded-[60px] border shadow-2xl flex flex-col md:flex-row items-center gap-12 group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#2D3E2F]/10'}`}>
+             <div className="absolute top-0 right-0 w-64 h-64 bg-[#2D3E2F]/5 rounded-full -translate-y-20 translate-x-20 transition-transform group-hover:scale-110 duration-700" />
   
-  <div className="relative">
-    <div className="w-56 h-56 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-center text-8xl font-serif shadow-2xl relative z-10 transition-transform duration-500 group-hover:rotate-3">
+            <div className="relative">
+    <div className="w-56 h-56 rounded-[50px] bg-[#2D3E2F] overflow-hidden flex items-center justify-center shadow-2xl relative z-10 transition-transform duration-500 group-hover:rotate-3">
+  {userData.photo ? (
+    <img 
+      src={userData.photo} 
+      alt="Profile" 
+      className="w-full h-full object-cover" 
+    />
+  ) : (
+    <span className="text-[#F0EFE9] text-8xl font-serif">
       {userData.initials}
-    </div>
+    </span>
+  )}
+</div>
     <div className="absolute -inset-4 border-2 border-dashed border-[#2D3E2F]/20 rounded-[60px] animate-[spin_20s_linear_infinite] pointer-events-none" />
     <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-emerald-500 rounded-full border-8 border-white flex items-center justify-center text-white shadow-xl z-20">
       <ShieldCheck size={24} />
@@ -595,12 +640,9 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
       {/* TRIGGER MODAL */}
       <button 
         onClick={() => { setFormData({...userData}); setShowUpdateModal(true); }}
-        className="flex items-center gap-3 px-10 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#2D3E2F]/20"
+        className="flex items-center gap-3 px-10 py-5 bg-[#2D3E2F] text-white rounded-3xl text-[11px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#2D3E2F]/20"
       >
         <Edit3 size={18} /> Update Profile
-      </button>
-      <button className="flex items-center gap-3 px-10 py-5 bg-white border border-[#2D3E2F]/10 text-[#2D3E2F] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#F3F1E9] transition-all">
-        <Plus size={18} /> Add Contact
       </button>
     </div>
   </div>
@@ -648,18 +690,40 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 
   {/* CLINICAL CIRCLE - Full Width Section */}
   <div className={`p-16 rounded-[60px] border flex flex-col gap-10 ${cardClass}`}>
-    <div className="border-b border-[#2D3E2F]/15 pb-8">
+    <div className="border-b-2 border-[#2D3E2F]/20 pb-8 flex justify-between items-center">
+    <div>
       <h3 className="text-3xl font-serif flex items-center gap-4 text-[#2D3E2F]">
-        <UserCircle size={28} strokeWidth={1.5} className="opacity-40" /> Clinical Circle
+        <UserCircle size={28} strokeWidth={2} /> Clinical Circle
       </h3>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-2 ml-12">Verified Care Team Nodes</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mt-2 ml-12 font-sans">Verified Care Team Nodes</p>
     </div>
+    <button 
+      onClick={() => setShowContactModal(true)}
+      className="px-8 py-4 bg-[#2D3E2F] text-white rounded-full text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
+    >
+      + Add New Contact
+    </button>
+  </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-      <ContactCard role="Primary Caregiver" name="Prisha" sub="MD Candidate • GMERS" initial="A" />
-      <ContactCard role="Attending Physician" name="Dr. Arya Shah" sub="Cardiologist • Apollo" initial="S" />
-      <ContactCard role="Emergency Contact" name="Family Line" sub="Verified Node" initial="F" />
-    </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    {contacts.map((person) => (
+      <div key={person.id} className="relative group">
+        <ContactCard 
+          role={person.role} 
+          name={person.name} 
+          sub={person.sub} 
+          initial={person.initial} 
+        />
+        {/* Delete Action Overlay */}
+        <button 
+          onClick={() => deleteContact(person.id)}
+          className="absolute top-4 right-4 p-2 bg-rose-50 text-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500 hover:text-white"
+        >
+          <Trash2 size={14} />
+        </button>
+      </div>
+    ))}
+  </div>
 
     {/* Facility Badge */}
     <div className="mt-6 p-8 rounded-[40px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-between shadow-2xl shadow-[#2D3E2F]/20">
@@ -669,7 +733,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         </div>
         <div>
           <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50 mb-1">Preferred Medical Facility</p>
-          <p className="text-xl font-serif italic">Sterling Hospital, Ahmedabad</p>
+          <p className="text-xl font-serif">Sterling Hospital, Ahmedabad</p>
         </div>
       </div>
       <ArrowUpRight className="opacity-40" size={24} />
@@ -678,7 +742,63 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 </div>
             </div>
           )}
-          {showUpdateModal && (
+
+          {showContactModal && (
+  <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-[#2D3E2F]/40 backdrop-blur-md animate-in fade-in duration-300">
+    <div className="min-h-full w-full flex items-center justify-center py-12">
+    <div className={`w-full max-w-lg p-12 rounded-[50px] border-2 shadow-2xl ${cardClass} space-y-8 animate-in zoom-in-95`}>
+      <div className="flex justify-between items-center border-b-2 border-[#2D3E2F]/10 pb-6">
+        <h2 className="text-3xl font-serif italic text-[#2D3E2F]">New Clinical Node</h2>
+        <button onClick={() => setShowContactModal(false)} className="opacity-30 hover:opacity-100"><X size={24} /></button>
+      </div>
+
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">Care Role</label>
+          <input 
+            placeholder="e.g. Primary Physician"
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
+            value={newContact.role}
+            onChange={(e) => setNewContact({...newContact, role: e.target.value})}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">Full Name</label>
+          <input 
+            placeholder="Dr. Jane Smith"
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
+            value={newContact.name}
+            onChange={(e) => setNewContact({...newContact, name: e.target.value})}
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">Credentials / Affiliation</label>
+          <input 
+            placeholder="Neurologist • City Hospital"
+            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
+            value={newContact.sub}
+            onChange={(e) => setNewContact({...newContact, sub: e.target.value})}
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4 pt-4">
+        <button 
+          onClick={handleAddContact}
+          className="flex-1 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-xl"
+        >
+          Verify & Add Node
+        </button>
+      </div>
+    </div>
+    </div>
+  </div>
+)}
+          
+        </div>
+      </main>
+      {showUpdateModal && (
+            
   <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#2D3E2F]/20 backdrop-blur-md animate-in fade-in duration-300">
     <div className={`w-full max-w-xl p-12 rounded-[50px] border shadow-2xl ${cardClass} space-y-8 animate-in zoom-in-95 duration-300`}>
       <div className="flex justify-between items-center">
@@ -688,6 +808,28 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 
       <div className="grid grid-cols-2 gap-6">
         <div className="col-span-2 space-y-2">
+          <div className="col-span-2 space-y-4 mb-4">
+  <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">
+    Identity Image URL
+  </label>
+  <div className="flex gap-6 items-center">
+    {/* Real-time Preview */}
+    <div className="w-20 h-20 rounded-2xl bg-[#2D3E2F]/10 border-2 border-dashed border-[#2D3E2F]/20 flex items-center justify-center overflow-hidden">
+      {formData.photo ? (
+        <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
+      ) : (
+        <Camera size={32} className="opacity-20" />
+      )}
+    </div>
+    <input 
+      type="text"
+      placeholder="Paste link (e.g. unsplash.com/...)"
+      className="flex-1 p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-sm font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
+      value={formData.photo || ''}
+      onChange={(e) => setFormData({...formData, photo: e.target.value})}
+    />
+  </div>
+</div>
           <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Full Name</label>
           <input 
             className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/5"
@@ -741,8 +883,6 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
     </div>
   </div>
 )}
-        </div>
-      </main>
     </div>
   );
 }
