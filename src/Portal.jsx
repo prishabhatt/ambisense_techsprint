@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Shield, LayoutDashboard, Activity, Stethoscope, User, LogOut, 
   Bell, AlertTriangle, CheckCircle, Eye, EyeOff, Calendar, 
@@ -131,19 +131,32 @@ const SquareStatCard = ({ label, value, subtext, icon: Icon, bgColor, textColor 
   </div>
 );
 // Dossier Item
-const DossierItem = ({ label, value, sub }) => (
-  <div className="space-y-3 border-l border-[#2D3E2F]/10 pl-8 group hover:border-[#2D3E2F]/30 transition-all">
-    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#2D3E2F]/50 leading-none">
-      {label}
-    </p>
-    <p className="text-3xl font-serif text-[#1C1C1C] tracking-tight leading-tight">
-      {value}
-    </p>
-    <p className="text-[14px] font-medium text-[#2D3E2F]/50 font-serif">
-      {sub}
-    </p>
-  </div>
-);
+function DossierItem({ label, value, sub, darkMode }) {
+  return (
+    <div className="space-y-2">
+      {/* Label: Sage Green in dark mode */}
+      <p className={`text-[10px] font-black uppercase tracking-widest transition-colors ${
+        darkMode ? 'text-[#A3B18A]' : 'text-[#2D3E2F]/40'
+      }`}>
+        {label}
+      </p>
+      
+      {/* Value: Pure White in dark mode */}
+      <h4 className={`text-4xl font-serif transition-colors ${
+        darkMode ? 'text-white' : 'text-[#1C1C1C]'
+      }`}>
+        {value}
+      </h4>
+      
+      {/* Subtext: Muted Champagne in dark mode */}
+      <p className={`text-[11px] font-medium transition-colors ${
+        darkMode ? 'text-[#F0EFE9]/40' : 'text-[#2D3E2F]/50'
+      }`}>
+        {sub}
+      </p>
+    </div>
+  );
+}
 
 // Contact Card 
 const ContactCard = ({ role, name, sub, initial }) => (
@@ -158,6 +171,20 @@ const ContactCard = ({ role, name, sub, initial }) => (
     </div>
   </div>
 );
+
+const contactPastels = [
+  { bg: 'bg-[#E9EDC9]', text: 'text-[#2D3E2F]' }, // Sage
+  { bg: 'bg-[#CCD5AE]', text: 'text-[#2D3E2F]' }, // Moss
+  { bg: 'bg-[#FAEDCD]', text: 'text-[#2D3E2F]' }  // Sand
+];
+
+const COLORS = {
+  sage: "#A3B18A",      // Primary data color
+  moss: "#588157",      // Secondary/Hover color
+  champagne: "#DAD7CD", // Muted text/grid color
+  bronze: "#A68A64",    // Used sparingly for accents
+  bgDark: "#1B261C"     // Matching your card backgrounds
+};
 
 const DashboardUI = ({ user, isLoggedIn, onLogout, darkMode, setDarkMode }) => {
 // Initial care team data
@@ -216,6 +243,9 @@ const handleUpdate = () => {
   const [currentAction, setCurrentAction] = useState('Sitting');
   //const [darkMode, setDarkMode] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+
+  const [editingContactId, setEditingContactId] = useState(null);
+  const [editContactData, setEditContactData] = useState(null);
   
   const [clinicalNotes, setClinicalNotes] = useState([
     { id: 1, text: "Patient followed morning vitals stable. Completed 15 mins of light walking.", date: "Jan 1, 09:15 am", author: "Caregiver" },
@@ -255,7 +285,12 @@ const handleUpdate = () => {
   }, [isLoggedIn]);
 
   
-  
+  const axisTextStyle = {
+  fill: darkMode ? '#F0EFE9' : '#2D3E2F', 
+  fontSize: 14, // Increased from 10
+  fontWeight: 600, // Higher intensity/boldness
+  opacity: 0.9 // Higher visibility than the previous 0.4 or 0.6
+};
 
   const readScheduleAloud = async () => {
     if (isSpeaking) return;
@@ -315,7 +350,12 @@ const handleUpdate = () => {
   if (!isLoggedIn) return <LoginPage darkMode={darkMode} onLogin={(u) => { setUser(u); setIsLoggedIn(true); }} setDarkMode={setDarkMode} />;
 
   const isFamily = user?.role === 'family';
-  const cardClass = darkMode ? 'bg-slate-800 border-slate-700 text-slate-100 shadow-none' : 'bg-[#FAF9F6] border-[#2D3E2F]/10 shadow-sm text-[#1C1C1C]';
+  const cardClass = useMemo(() => (
+  darkMode 
+    ? 'bg-[#1B261C] border-white/5 text-[#F0EFE9] shadow-2xl' 
+    : 'bg-[#FAF9F6] border-[#2D3E2F]/10 shadow-sm text-[#1C1C1C]'
+), [darkMode]);
+
   // Calculate dynamic values for cards
   const getMetricValue = (label) => {
   if (label === 'Steps') {
@@ -330,14 +370,15 @@ const handleUpdate = () => {
   }
   return label === 'Stability' ? "88%" : "99%"; // Defaults
 };
+const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
 // Select the correct data set for the chart
 const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week' ? DATA_WEEK : DATA_MONTH);
   return (
-    <div className={`flex h-screen overflow-hidden ${darkMode ? 'dark bg-slate-950' : 'bg-[#F0EFE9]'}`}>
-      
+    
+    <div className={`flex h-screen overflow-hidden transition-colors duration-500 ${darkMode ? 'dark bg-[#141d15]' : 'bg-[#F0EFE9]'}`}>  
       {/* SIDEBAR: Forest Green Styling */}
-      <aside className={`w-72 flex flex-col z-20 ${darkMode ? 'bg-slate-900 border-r border-slate-800' : 'bg-[#2D3E2F] shadow-2xl'}`}>
+      <aside className={`w-72 flex flex-col z-20 transition-all duration-500 ${darkMode ? 'bg-[#0d120e] border-r border-white/5' : 'bg-[#2D3E2F] shadow-2xl'}`}>
         <div className="p-10 flex flex-col items-center border-b border-white/10">
           {/* The Hover-able Logo Container */}
     <button 
@@ -376,7 +417,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
       </aside>
 
       <main className="flex-1 flex flex-col min-w-0 relative">
-        <header className={`h-20 flex items-center justify-between px-10 ${darkMode ? 'bg-slate-900 border-b border-slate-800' : 'bg-transparent border-b border-[#2D3E2F]/5'}`}>
+        <header className={`h-20 flex items-center justify-between px-10 border-b transition-colors duration-500 ${darkMode ? 'bg-[#141d15] border-white/5' : 'bg-transparent border-[#2D3E2F]/5'}`}>
           <h2 className={`text-2xl font-serif tracking-tight ${darkMode ? 'text-white' : 'text-[#1C1C1C]'}`}>{currentPage}</h2>
           <div className="flex items-center gap-6">
             <button onClick={() => setDarkMode(!darkMode)} className={`p-3 rounded-full transition-all ${darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-[#2D3E2F]/5 text-[#2D3E2F]'}`}>{darkMode ? <Sun size={20} /> : <Moon size={20} />}</button>
@@ -529,17 +570,25 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
           {currentPage === 'Wellness Stats' && (
   <div className="space-y-10 animate-in fade-in duration-700">
     <div className="flex items-center justify-between">
-      <h1 className="text-3xl font-serif tracking-tight">Wellness Center</h1>
+      <h1 className={`text-3xl font-serif tracking-tight transition-colors duration-300 ${
+  darkMode ? 'text-[#F0EFE9]' : 'text-[#1C1C1C]'
+}`}>
+  Wellness Center
+</h1>
       <div className={`p-1 rounded-full border flex ${cardClass}`}>
         {['Day', 'Week', 'Month'].map(r => (
-          <button 
-            key={r} 
-            onClick={() => setWellnessRange(r)} 
-            className={`px-10 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${wellnessRange === r ? 'bg-[#2D3E2F] text-[#F0EFE9]' : 'text-[#2D3E2F]/40 hover:bg-[#2D3E2F]/5'}`}
-          >
-            {r}
-          </button>
-        ))}
+  <button 
+    key={r} 
+    onClick={() => setWellnessRange(r)} 
+    className={`px-10 py-3 rounded-full text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+      wellnessRange === r 
+        ? (darkMode ? 'bg-[#A3B18A] text-[#1B261C]' : 'bg-[#2D3E2F] text-[#F0EFE9]') 
+        : (darkMode ? 'text-[#F0EFE9]/40 hover:text-[#F0EFE9] hover:bg-white/5' : 'text-[#2D3E2F]/40 hover:bg-[#2D3E2F]/5')
+    }`}
+  >
+    {r}
+  </button>
+))}
       </div>
     </div>
 
@@ -556,60 +605,200 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
       <h3 className="text-xl font-serif mb-14 tracking-tight">{wellnessRange} Intensity Trend</h3>
       <div className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          {wellnessRange === 'Day' ? (
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="c" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2D3E2F" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#2D3E2F" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} />
-              <XAxis dataKey="time" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} />
-              <Tooltip />
-              <Area type="monotone" dataKey="intensity" stroke="#2D3E2F" strokeWidth={3} fillOpacity={1} fill="url(#c)" />
-            </AreaChart>
-          ) : (
-            <BarChart data={chartData}>
-              <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={0.05} />
-              <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{fill: '#2D3E2F', fontSize: 10, opacity: 0.4}} />
-              <Tooltip />
-              <Bar dataKey={wellnessRange === 'Month' ? 'steps' : 'steps'} fill="#2D3E2F" radius={[10, 10, 0, 0]} barSize={40} />
-            </BarChart>
-          )}
-        </ResponsiveContainer>
+  {wellnessRange === 'Day' ? (
+    <AreaChart data={chartData}>
+      <defs>
+        <linearGradient id="c" x1="0" y1="0" x2="0" y2="1">
+          {/* Use a lighter green or gold for the gradient stop */}
+          <stop offset="5%" stopColor={darkMode ? "#A3B18A" : "#2D3E2F"} stopOpacity={0.3}/>
+          <stop offset="95%" stopColor={darkMode ? "#A3B18A" : "#2D3E2F"} stopOpacity={0}/>
+        </linearGradient>
+      </defs>
+      <CartesianGrid vertical={false} strokeDasharray="3 3" strokeOpacity={darkMode ? 0.1 : 0.05} stroke={darkMode ? "#fff" : "#000"} />
+      <XAxis 
+        dataKey="time" 
+        axisLine={false} 
+        tickLine={false} 
+        tick={{fill: darkMode ? '#F0EFE9' : '#2D3E2F', fontSize: 10, opacity: 0.6}} 
+      />
+      <Tooltip contentStyle={darkMode ? {backgroundColor: '#1B261C', border: 'none', color: '#fff'} : {}} />
+      <Area 
+      type="monotone" 
+      dataKey="intensity" 
+      stroke="#A3B18A" // Sage Green
+      strokeWidth={3} 
+      fillOpacity={1} 
+      fill="url(#c)" 
+      />
+    </AreaChart>
+  ) : (
+    <BarChart data={chartData}>
+  <CartesianGrid 
+    vertical={false} 
+    strokeDasharray="3 3" 
+    strokeOpacity={0.1} 
+    stroke={COLORS.champagne} 
+  />
+      <XAxis 
+    dataKey="label" 
+    axisLine={false} 
+    tickLine={false} 
+    tick={{fill: COLORS.champagne, fontSize: 10, opacity: 0.6}} 
+  />
+      <Tooltip 
+    cursor={{ fill: 'rgba(163, 177, 138, 0.05)' }} // Very soft sage highlight
+    contentStyle={{ 
+      backgroundColor: COLORS.bgDark, 
+      border: '1px solid rgba(255,255,255,0.05)', 
+      borderRadius: '15px',
+      color: COLORS.champagne,
+      fontSize: '12px'
+    }}
+    itemStyle={{ color: COLORS.sage }}
+  />
+      <Bar 
+    dataKey="steps" 
+    fill={COLORS.sage} // Switching harsh bronze to soft Sage
+    radius={[10, 10, 0, 0]} 
+    barSize={40} 
+    activeBar={{ fill: COLORS.moss }} // Muted transition on hover
+  />
+</BarChart>
+  )}
+</ResponsiveContainer>
       </div>
     </div>
   </div>
 )}
 
           {currentPage === 'Medical Records' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
-              <div className={`p-12 rounded-[50px] border ${cardClass}`}>
-                <h3 className="text-2xl font-serif mb-10 flex items-center gap-4 tracking-tight"><Stethoscope size={28} className="text-[#2D3E2F]" /> Clinical Logs</h3>
-                {!isFamily ? (<div className="space-y-6 mb-12"><textarea value={noteInput} onChange={(e) => setNoteInput(e.target.value)} placeholder="Enter clinical observation..." className={`w-full p-8 rounded-[35px] outline-none border focus:ring-4 focus:ring-[#2D3E2F]/5 transition-all text-sm placeholder-[#2D3E2F]/20 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-[#2D3E2F]/5 border-[#2D3E2F]/5'}`} rows="4" /><button onClick={handleSaveNote} className="w-full bg-[#2D3E2F] text-[#F0EFE9] py-6 rounded-full text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">Submit Medical Record</button></div>) : (<div className="p-6 bg-amber-50 border border-amber-200 rounded-[25px] text-amber-800 text-[10px] font-black uppercase tracking-widest mb-10 flex items-center gap-3"><Shield size={20} /> Encrypted View Mode</div>)}
-                <div className="space-y-4">{clinicalNotes.map(n => <div key={n.id} className={`p-8 rounded-[35px] border ${cardClass}`}><div className="flex justify-between mb-4 text-[10px] font-black uppercase tracking-widest opacity-30"><span>{n.author}</span><span>{n.date}</span></div>{editingNoteId === n.id ? (<div className="space-y-4"><textarea value={editValue} onChange={(e) => setEditValue(e.target.value)} className="w-full p-6 rounded-2xl border bg-transparent text-sm outline-none" /><div className="flex gap-2"><button onClick={saveEdit} className="px-6 py-2 bg-[#2D3E2F] text-white rounded-full text-[10px] font-black uppercase">Save</button><button onClick={() => setEditingNoteId(null)} className="px-6 py-2 bg-slate-100 rounded-full text-[10px] font-black uppercase tracking-widest">Exit</button></div></div>) : (<><p className="text-sm leading-relaxed mb-6">{n.text}</p>{!isFamily && (<div className="flex gap-6 border-t border-[#2D3E2F]/5 pt-5"><button onClick={() => startEdit(n)} className="text-[#2D3E2F]/30 hover:text-[#2D3E2F] transition-all"><Edit3 size={16} /></button><button onClick={() => deleteNote(n.id)} className="text-[#2D3E2F]/30 hover:text-rose-500 transition-all"><Trash2 size={16} /></button></div>)}</>)}</div>)}</div>
-              </div>
-              <div className="space-y-12">
-                <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}><h3 className="text-2xl font-serif mb-6 flex items-center gap-4 tracking-tight"><Sparkles size={28}/> Research Vault</h3><div className="relative mb-10"><input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." /><button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">{isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}</button></div>{researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal ">"{researchOutput}"</div>}</div>
-                <div className={`p-12 rounded-[50px] border ${cardClass}`}><div className="flex items-center justify-between mb-8"><h3 className="text-2xl font-serif tracking-tight"><h2 className="flex items-center gap-2 text-2xl font-serif">
-  <Brain className="w-6 h-6 text-black" /> 
-  AI Insights
-</h2></h3><button onClick={handleSummary} disabled={isGeneratingSummary} className="p-4 bg-[#2D3E2F] text-[#F0EFE9] rounded-full hover:scale-110 active:scale-90 transition-all shadow-xl">{isGeneratingSummary ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}</button></div><div className={`p-8 rounded-[30px] text-sm leading-relaxed italic ${darkMode ? 'bg-slate-800' : 'bg-[#2D3E2F]/5 border border-[#2D3E2F]/5'}`}>"{aiSummary}"</div></div>
-              </div>
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+    <div className={`p-12 rounded-[50px] border ${cardClass}`}>
+      <h3 className={`text-2xl font-serif mb-10 flex items-center gap-4 tracking-tight ${darkMode ? 'text-white' : 'text-[#2D3E2F]'}`}>
+        <Stethoscope size={28} /> Clinical Logs
+      </h3>
+      
+      {!isFamily ? (
+        <div className="space-y-6 mb-12">
+          <textarea 
+            value={noteInput} 
+            onChange={(e) => setNoteInput(e.target.value)} 
+            placeholder="Enter clinical observation..." 
+            className={`w-full p-8 rounded-[35px] outline-none border transition-all text-sm 
+              ${darkMode 
+                ? 'bg-[#2D3E2F]/30 border-white/10 text-white placeholder-white/40' 
+                : 'bg-[#2D3E2F]/5 border-[#2D3E2F]/10 text-[#1C1C1C] placeholder-[#2D3E2F]/30'
+              } focus:ring-4 focus:ring-[#A3B18A]/20`} 
+            rows="4" 
+          />
+          <button onClick={handleSaveNote} className="w-full bg-[#2D3E2F] text-[#F0EFE9] py-6 rounded-full text-xs font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all">
+            Submit Medical Record
+          </button>
+        </div>
+      ) : (
+        <div className="p-6 bg-amber-50 border border-amber-200 rounded-[25px] text-amber-800 text-[10px] font-black uppercase tracking-widest mb-10 flex items-center gap-3">
+          <Shield size={20} /> Encrypted View Mode
+        </div>
+      )}
+
+      <div className="space-y-4">
+        {clinicalNotes.map(n => (
+          <div key={n.id} className={`p-8 rounded-[35px] border ${cardClass}`}>
+            <div className="flex justify-between mb-4 text-[10px] font-black uppercase tracking-widest opacity-30">
+              <span>{n.author}</span>
+              <span>{n.date}</span>
             </div>
-          )}
+            {editingNoteId === n.id ? (
+              <div className="space-y-4">
+                <textarea 
+                  value={editValue} 
+                  onChange={(e) => setEditValue(e.target.value)} 
+                  className={`w-full p-6 rounded-2xl border bg-transparent text-sm outline-none ${darkMode ? 'text-white border-white/20' : 'text-black border-black/10'}`} 
+                />
+                <div className="flex gap-2">
+                  <button onClick={saveEdit} className="px-6 py-2 bg-[#2D3E2F] text-white rounded-full text-[10px] font-black uppercase">Save</button>
+                  <button onClick={() => setEditingNoteId(null)} className={`px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${darkMode ? 'bg-white/10 text-white' : 'bg-slate-100'}`}>Exit</button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="text-sm leading-relaxed mb-6">{n.text}</p>
+                {!isFamily && (
+                  /* FIXED: Edit and Delete buttons now use theme-aware colors */
+                  <div className={`flex gap-6 border-t pt-5 ${darkMode ? 'border-white/10' : 'border-[#2D3E2F]/5'}`}>
+                    <button 
+                      onClick={() => startEdit(n)} 
+                      className={`transition-all ${darkMode ? 'text-[#A3B18A] hover:text-white' : 'text-[#2D3E2F]/30 hover:text-[#2D3E2F]'}`}
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button 
+                      onClick={() => deleteNote(n.id)} 
+                      className={`transition-all ${darkMode ? 'text-rose-400 hover:text-rose-500' : 'text-[#2D3E2F]/30 hover:text-rose-500'}`}
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="space-y-12">
+      <div className={`p-12 rounded-[50px] bg-[#2D3E2F] text-[#F0EFE9] shadow-2xl relative overflow-hidden`}>
+        <h3 className="text-2xl font-serif mb-6 flex items-center gap-4 tracking-tight"><Sparkles size={28}/> Research Vault</h3>
+        <div className="relative mb-10">
+          <input type="text" value={researchQuery} onChange={(e) => setResearchQuery(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleResearch()} className="w-full bg-white/10 border border-white/10 rounded-full p-6 pr-20 outline-none focus:ring-4 focus:ring-white/20 text-sm placeholder-white/40 text-white" placeholder="Search medical database..." />
+          <button onClick={handleResearch} disabled={isResearching} className="absolute right-3 top-3 p-4 bg-[#FAF9F6] text-[#2D3E2F] rounded-full hover:scale-105 active:scale-90 transition-all">
+            {isResearching ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
+          </button>
+        </div>
+        {researchOutput && <div className="p-8 bg-white/5 rounded-[30px] text-xs leading-relaxed italic opacity-80 animate-in fade-in shadow-inner font-normal ">"{researchOutput}"</div>}
+      </div>
+
+      <div className={`p-12 rounded-[50px] border ${cardClass}`}>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-2 text-2xl font-serif tracking-tight">
+            {/* FIXED: Brain icon now switches color based on darkMode */}
+            <Brain className={`w-6 h-6 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-black'}`} /> 
+            <span className={darkMode ? 'text-white' : 'text-[#1C1C1C]'}>AI Insights</span>
+          </div>
+          <button onClick={handleSummary} disabled={isGeneratingSummary} className="p-4 bg-[#2D3E2F] text-[#F0EFE9] rounded-full hover:scale-110 active:scale-90 transition-all shadow-xl">
+            {isGeneratingSummary ? <Loader2 size={24} className="animate-spin" /> : <Sparkles size={24} />}
+          </button>
+        </div>
+        <div className={`p-8 rounded-[30px] text-sm leading-relaxed italic border transition-all ${
+          darkMode 
+            ? 'bg-[#A3B18A]/5 border-[#A3B18A]/10 text-[#F0EFE9]' 
+            : 'bg-[#2D3E2F]/5 border-[#2D3E2F]/5 text-[#2D3E2F]'
+        }`}>
+          "{aiSummary}"
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
           {currentPage === 'Profile' && (
             <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 pb-20">
               
               {/* SECTION 1: THE IDENTITY HEADER */}
               
-              <div className={`relative overflow-hidden p-12 rounded-[60px] border shadow-2xl flex flex-col md:flex-row items-center gap-12 group ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-[#2D3E2F]/10'}`}>
+              <div className={`relative overflow-hidden p-12 rounded-[60px] border shadow-2xl flex flex-col md:flex-row items-center gap-12 group transition-colors duration-500 ${
+              darkMode 
+              ? 'bg-[#1B261C] border-white/5 shadow-2xl' // Evergreen Dark
+              : 'bg-white border-[#2D3E2F]/10' }`}>
              <div className="absolute top-0 right-0 w-64 h-64 bg-[#2D3E2F]/5 rounded-full -translate-y-20 translate-x-20 transition-transform group-hover:scale-110 duration-700" />
   
             <div className="relative">
-    <div className="w-56 h-56 rounded-[50px] bg-[#2D3E2F] overflow-hidden flex items-center justify-center shadow-2xl relative z-10 transition-transform duration-500 group-hover:rotate-3">
+    <div className={`p-16 rounded-[60px] border flex items-center gap-16 group transition-all duration-500 ${
+  darkMode 
+    ? 'bg-[#A3B18A]/10 border-white/5 text-[#F0EFE9] shadow-[inset_0px_0px_40px_rgba(163,177,138,0.05)]' 
+    : 'bg-[#FAF9F6] border-[#2D3E2F]/5 text-[#1C1C1C]'
+}`}>
   {userData.photo ? (
     <img 
       src={userData.photo} 
@@ -617,12 +806,16 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
       className="w-full h-full object-cover" 
     />
   ) : (
-    <span className="text-[#F0EFE9] text-8xl font-serif">
-      {userData.initials}
+    <span className={`text-8xl font-serif transition-colors duration-500 ${
+    darkMode ? 'text-[#F0EFE9]' : 'text-[#2D3E2F]'
+    }`}>
+    {userData.initials}
     </span>
   )}
 </div>
-    <div className="absolute -inset-4 border-2 border-dashed border-[#2D3E2F]/20 rounded-[60px] animate-[spin_20s_linear_infinite] pointer-events-none" />
+    <div className={`absolute -inset-4 border-2 border-dashed rounded-[60px] animate-[spin_20s_linear_infinite] pointer-events-none transition-colors duration-500 ${
+  darkMode ? 'border-[#A3B18A]/30' : 'border-[#2D3E2F]/20'
+}`} />
     <div className="absolute -bottom-2 -right-2 w-14 h-14 bg-emerald-500 rounded-full border-8 border-white flex items-center justify-center text-white shadow-xl z-20">
       <ShieldCheck size={24} />
     </div>
@@ -630,8 +823,14 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 
   <div className="flex-1 space-y-6 text-center md:text-left relative z-10">
     <div>
-      <h1 className="text-7xl font-serif tracking-tighter text-[#1C1C1C] leading-none">{userData.name}</h1>
-      <p className="text-[#2D3E2F]/50 text-xl font-serif italic mt-3 flex items-center justify-center md:justify-start gap-3">
+      <h1 className={`text-7xl font-serif tracking-tighter leading-none transition-colors ${
+      darkMode ? 'text-white' : 'text-[#1C1C1C]'
+      }`}>
+      {userData.name}
+      </h1>
+      <p className={`text-xl font-serif mt-3 flex items-center justify-center md:justify-start gap-3 transition-colors duration-500 ${
+  darkMode ? 'text-[#A3B18A]' : 'text-[#2D3E2F]/50'
+}`}>
         {userData.age} years <span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> Blood Type {userData.bloodType} <span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> {userData.location}
       </p>
     </div>
@@ -653,26 +852,30 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
   
               {/* BIOMETRIC DOSSIER - Full Width Section */}
               <div className={`p-16 rounded-[60px] border shadow-sm flex flex-col gap-12 ${cardClass}`}>
-              <div className="flex justify-between items-end border-b border-[#2D3E2F]/15 pb-8">
+              <div className={`flex justify-between items-end border-b pb-8 ${darkMode ? 'border-white/10' : 'border-[#2D3E2F]/15'}`}>
               <div>
-              <h3 className="text-3xl font-serif flex items-center gap-4 text-[#2D3E2F]">
-              <Heart size={28} strokeWidth={1.5} /> Biometric Dossier
-              </h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-30 mt-2 ml-12">Vital Signs Baseline</p>
-            </div>
-            <button className="text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 flex items-center gap-2 px-6 py-3 border border-[#2D3E2F]/20 rounded-full transition-all">
+                <h3 className={`text-3xl font-serif flex items-center gap-4 ${darkMode ? 'text-white' : 'text-[#2D3E2F]'}`}>
+                  <Heart size={28} strokeWidth={1.5} /> Biometric Dossier
+                </h3>
+                <p className={`text-[10px] font-black uppercase tracking-[0.3em] mt-2 ml-12 ${darkMode ? 'text-[#A3B18A]' : 'opacity-30'}`}>
+                  Vital Signs Baseline
+                </p>
+              </div>
+            <button className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-2 px-6 py-3 border rounded-full transition-all ${
+            darkMode ? 'border-white/20 text-white hover:bg-white/5' : 'border-[#2D3E2F]/20 opacity-40 hover:opacity-100'
+            }`}>
             <FileText size={14} /> Full Export
             </button>
             </div>
 
     {/* Refined Metric Grid with Better Spacing */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-y-16 gap-x-12">
-      <DossierItem label="Resting Heart Rate" value="72 BPM" sub="Last check: 2h ago" />
-      <DossierItem label="Blood Pressure" value="122/78" sub="Category: Normal" />
-      <DossierItem label="SpO2 Level" value="98%" sub="Stable Baseline" />
-      <DossierItem label="Height / Weight" value="174 cm / 68 kg" sub="BMI: 22.5 (Healthy)" />
-      <DossierItem label="Blood Glucose" value="94 mg/dL" sub="Fasting Average" />
-      <DossierItem label="Daily Calorie Goal" value="1,850 kcal" sub="Measured Intake" />
+      <DossierItem label="Resting Heart Rate" value="72 BPM" sub="Last check: 2h ago" darkMode={darkMode} />
+      <DossierItem label="Blood Pressure" value="122/78" sub="Category: Normal" darkMode={darkMode} />
+      <DossierItem label="SpO2 Level" value="98%" sub="Stable Baseline" darkMode={darkMode}/>
+      <DossierItem label="Height / Weight" value="174 cm / 68 kg" sub="BMI: 22.5 (Healthy)" darkMode={darkMode} />
+      <DossierItem label="Blood Glucose" value="94 mg/dL" sub="Fasting Average" darkMode={darkMode}/>
+      <DossierItem label="Daily Calorie Goal" value="1,850 kcal" sub="Measured Intake" darkMode={darkMode}/>
     </div>
 
     {/* Tags Section */}
@@ -690,13 +893,17 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 
   {/* CLINICAL CIRCLE - Full Width Section */}
   <div className={`p-16 rounded-[60px] border flex flex-col gap-10 ${cardClass}`}>
-    <div className="border-b-2 border-[#2D3E2F]/20 pb-8 flex justify-between items-center">
-    <div>
-      <h3 className="text-3xl font-serif flex items-center gap-4 text-[#2D3E2F]">
-        <UserCircle size={28} strokeWidth={2} /> Clinical Circle
-      </h3>
-      <p className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mt-2 ml-12 font-sans">Verified Care Team Nodes</p>
-    </div>
+    <div className={`flex justify-between items-end border-b pb-8 ${darkMode ? 'border-white/10' : 'border-[#2D3E2F]/15'}`}>
+  <div>
+    {/* FIXED: Dynamic color for icon and text */}
+    <h3 className={`text-3xl font-serif flex items-center gap-4 transition-colors ${darkMode ? 'text-white' : 'text-[#2D3E2F]'}`}>
+      <UserCircle size={28} strokeWidth={1.5} className={darkMode ? 'text-[#A3B18A]' : 'text-[#2D3E2F]'} /> 
+      Clinical Circle
+    </h3>
+      <p className={`text-[10px] font-black uppercase tracking-[0.3em] mt-2 ml-12 ${darkMode ? 'text-[#A3B18A]' : 'opacity-30'}`}>
+      Verified Care Team Nodes
+    </p>
+  </div>
     <button 
       onClick={() => setShowContactModal(true)}
       className="px-8 py-4 bg-[#2D3E2F] text-white rounded-full text-[10px] font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
@@ -705,25 +912,100 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
     </button>
   </div>
 
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-    {contacts.map((person) => (
-      <div key={person.id} className="relative group">
-        <ContactCard 
-          role={person.role} 
-          name={person.name} 
-          sub={person.sub} 
-          initial={person.initial} 
-        />
-        {/* Delete Action Overlay */}
-        <button 
-          onClick={() => deleteContact(person.id)}
-          className="absolute top-4 right-4 p-2 bg-rose-50 text-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-500 hover:text-white"
-        >
-          <Trash2 size={14} />
-        </button>
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+  {contacts.map((node, index) => {
+    const theme = contactPastels[index % contactPastels.length];
+    const isEditing = editingContactId === node.id;
+    
+    return (
+      <div 
+        key={node.id} 
+        className={`aspect-square p-10 rounded-[48px] shadow-sm flex flex-col justify-between transition-all relative group border
+          ${darkMode 
+            ? `${theme.bg} ${theme.text} border-transparent` 
+            : 'bg-[#FAF9F6] border-[#2D3E2F]/5 text-[#1C1C1C]' 
+          }`}
+      >
+        {/* Action Buttons (Top Right) */}
+        <div className="absolute top-8 right-8 flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+          {isEditing ? (
+            <button 
+              onClick={() => {
+                setContacts(contacts.map(c => c.id === node.id ? editContactData : c));
+                setEditingContactId(null);
+              }}
+              className="p-2 rounded-full bg-emerald-500 text-white shadow-lg"
+            >
+              <CheckCircle size={16} />
+            </button>
+          ) : (
+            <button 
+              onClick={() => {
+                setEditContactData({...node});
+                setEditingContactId(node.id);
+              }}
+              className={`p-2 rounded-full ${darkMode ? 'bg-black/10' : 'bg-[#2D3E2F]/5'}`}
+            >
+              <Edit3 size={16} />
+            </button>
+          )}
+          <button 
+            onClick={() => deleteContact(node.id)}
+            className={`p-2 rounded-full ${darkMode ? 'bg-black/10' : 'bg-[#2D3E2F]/5 text-rose-500'}`}
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+
+        {/* Top: Initial Avatar */}
+        <div className={`p-4 rounded-2xl w-fit shadow-sm 
+          ${darkMode ? 'bg-white/40' : 'bg-white border border-[#2D3E2F]/5'}`}>
+          <span className="text-xl font-serif font-bold uppercase">{node.initial}</span>
+        </div>
+
+        {/* Bottom: Caregiver Identity (Editable Fields) */}
+        <div className="space-y-2">
+          {isEditing ? (
+            <>
+              <input 
+                className={`w-full bg-transparent border-b text-[9px] font-black uppercase tracking-[0.2em] outline-none 
+                  ${darkMode ? 'border-black/20 text-[#2D3E2F]' : 'border-[#2D3E2F]/20 text-[#2D3E2F]'}`}
+                value={editContactData.role}
+                onChange={(e) => setEditContactData({...editContactData, role: e.target.value})}
+              />
+              <input 
+                className={`w-full bg-transparent border-b text-2xl font-serif font-bold leading-tight outline-none
+                  ${darkMode ? 'border-black/20 text-[#2D3E2F]' : 'border-[#2D3E2F]/20 text-[#1C1C1C]'}`}
+                value={editContactData.name}
+                onChange={(e) => setEditContactData({...editContactData, name: e.target.value, initial: e.target.value.charAt(0).toUpperCase()})}
+              />
+              <input 
+                className={`w-full bg-transparent border-b text-[10px] font-bold uppercase tracking-wider outline-none
+                  ${darkMode ? 'border-black/20 text-[#2D3E2F]' : 'border-[#2D3E2F]/20 text-[#2D3E2F]/60'}`}
+                value={editContactData.sub}
+                onChange={(e) => setEditContactData({...editContactData, sub: e.target.value})}
+              />
+            </>
+          ) : (
+            <>
+              <p className={`text-[9px] font-black uppercase tracking-[0.2em] mb-1 
+                ${darkMode ? 'opacity-40' : 'text-[#2D3E2F]/40'}`}>
+                {node.role}
+              </p>
+              <h3 className="text-2xl font-serif font-bold leading-tight">
+                {node.name}
+              </h3>
+              <p className={`text-[10px] font-bold mt-3 uppercase tracking-wider 
+                ${darkMode ? 'opacity-60' : 'text-[#2D3E2F]/60'}`}>
+                {node.sub}
+              </p>
+            </>
+          )}
+        </div>
       </div>
-    ))}
-  </div>
+    );
+  })}
+</div>
 
     {/* Facility Badge */}
     <div className="mt-6 p-8 rounded-[40px] bg-[#2D3E2F] text-[#F0EFE9] flex items-center justify-between shadow-2xl shadow-[#2D3E2F]/20">
@@ -1000,11 +1282,31 @@ function NavItem({ icon, label, active, onClick }) {
 
 function MetricCard({ label, value, trend, darkMode }) {
   return (
-    <div className={`p-10 rounded-[50px] border shadow-sm flex flex-col justify-center transition-all ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-[#FAF9F6] border-[#2D3E2F]/10'}`}>
-      <p className="text-[10px] font-black uppercase tracking-[0.3em] mb-4 opacity-40">{label}</p>
-      <div className="flex items-end justify-between font-normal">
-        <h3 className="text-4xl font-serif text-[#2D3E2F] tracking-tight">{value}</h3>
-        <div className={`text-[9px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest ${trend.includes('+') || trend === 'Secure' ? 'bg-[#2D3E2F]/5 text-[#2D3E2F]' : 'bg-rose-500/10 text-rose-600'}`}>{trend}</div>
+    <div className={`p-10 rounded-[50px] border shadow-sm transition-all duration-300 ${
+      darkMode 
+        ? 'bg-[#1B261C] border-white/5' // Sophisticated Dark Evergreen
+        : 'bg-[#FAF9F6] border-[#2D3E2F]/10' // Clean Champagne White
+    }`}>
+      <p className={`text-[10px] font-black uppercase tracking-[0.3em] mb-4 opacity-50 ${
+        darkMode ? 'text-[#A3B18A]' : 'text-[#2D3E2F]'
+      }`}>
+        {label}
+      </p>
+      
+      <div className="flex items-end justify-between">
+        {/* Value: Deep Charcoal in light, Pure White in dark */}
+        <h3 className={`text-4xl font-serif tracking-tight ${
+          darkMode ? 'text-white' : 'text-[#1C1C1C]'
+        }`}>
+          {value}
+        </h3>
+        
+        {/* Trend Badge: Sophisticated sage/dark green combo */}
+        <div className={`text-[9px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest ${
+          darkMode ? 'bg-white/5 text-[#A3B18A]' : 'bg-[#2D3E2F]/5 text-[#2D3E2F]'
+        }`}>
+          {trend}
+        </div>
       </div>
     </div>
   );
