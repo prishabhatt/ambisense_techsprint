@@ -416,7 +416,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 relative">
+      <main className="flex-1 flex flex-col min-w-0 relative h-screen overflow-hidden">
         <header className={`h-20 flex items-center justify-between px-10 border-b transition-colors duration-500 ${darkMode ? 'bg-[#141d15] border-white/5' : 'bg-transparent border-[#2D3E2F]/5'}`}>
           <h2 className={`text-2xl font-serif tracking-tight ${darkMode ? 'text-white' : 'text-[#1C1C1C]'}`}>{currentPage}</h2>
           <div className="flex items-center gap-6">
@@ -444,7 +444,8 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
             </div>
         </header>
 
-        <div className="flex-1 overflow-y-auto p-10 space-y-10 no-scrollbar ">
+        
+      <div className="flex-1 overflow-y-auto p-6 md:p-8 lg:p-10 space-y-10 no-scrollbar pb-32 w-full max-w-[1600px] mx-auto">
           {currentPage === 'Dashboard' && (
   <div className="space-y-8 animate-in fade-in duration-700">
     {/* 1. Security Alert Banner */}
@@ -619,7 +620,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
         dataKey="time" 
         axisLine={false} 
         tickLine={false} 
-        tick={{fill: darkMode ? '#F0EFE9' : '#2D3E2F', fontSize: 10, opacity: 0.6}} 
+        tick={{fill: darkMode ? '#F0EFE9' : '#2D3E2F', fontSize: 15, opacity: 0.6}} 
       />
       <Tooltip contentStyle={darkMode ? {backgroundColor: '#1B261C', border: 'none', color: '#fff'} : {}} />
       <Area 
@@ -643,7 +644,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
     dataKey="label" 
     axisLine={false} 
     tickLine={false} 
-    tick={{fill: COLORS.champagne, fontSize: 10, opacity: 0.6}} 
+    tick={{fill: COLORS.champagne, fontSize: 15, opacity: 0.6}} 
   />
       <Tooltip 
     cursor={{ fill: 'rgba(163, 177, 138, 0.05)' }} // Very soft sage highlight
@@ -672,11 +673,11 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
 )}
 
           {currentPage === 'Medical Records' && (
-  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
-    <div className={`p-12 rounded-[50px] border ${cardClass}`}>
-      <h3 className={`text-2xl font-serif mb-10 flex items-center gap-4 tracking-tight ${darkMode ? 'text-white' : 'text-[#2D3E2F]'}`}>
-        <Stethoscope size={28} /> Clinical Logs
-      </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
+              <div className={`p-12 rounded-[50px] border ${cardClass}`}>
+                <h3 className={`text-2xl font-serif mb-10 flex items-center gap-4 tracking-tight ${darkMode ? 'text-white' : 'text-[#2D3E2F]'}`}>
+                    <Stethoscope size={28} /> Clinical Logs
+                </h3>
       
       {!isFamily ? (
         <div className="space-y-6 mb-12">
@@ -724,7 +725,7 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
               <>
                 <p className="text-sm leading-relaxed mb-6">{n.text}</p>
                 {!isFamily && (
-                  /* FIXED: Edit and Delete buttons now use theme-aware colors */
+
                   <div className={`flex gap-6 border-t pt-5 ${darkMode ? 'border-white/10' : 'border-[#2D3E2F]/5'}`}>
                     <button 
                       onClick={() => startEdit(n)} 
@@ -1079,88 +1080,115 @@ const chartData = wellnessRange === 'Day' ? DATA_DAY : (wellnessRange === 'Week'
           
         </div>
       </main>
-      {showUpdateModal && (
-            
-  <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-[#2D3E2F]/20 backdrop-blur-md animate-in fade-in duration-300">
-    <div className={`w-full max-w-xl p-12 rounded-[50px] border shadow-2xl ${cardClass} space-y-8 animate-in zoom-in-95 duration-300`}>
-      <div className="flex justify-between items-center">
-        <h2 className="text-3xl font-serif italic text-[#2D3E2F]">Edit Medical Identity</h2>
-        <button onClick={() => setShowUpdateModal(false)} className="p-2 opacity-30 hover:opacity-100 transition-opacity"><X size={24} /></button>
-      </div>
-
-      <div className="grid grid-cols-2 gap-6">
-        <div className="col-span-2 space-y-2">
-          <div className="col-span-2 space-y-4 mb-4">
-  <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">
-    Identity Image URL
-  </label>
-  <div className="flex gap-6 items-center">
-    {/* Real-time Preview */}
-    <div className="w-20 h-20 rounded-2xl bg-[#2D3E2F]/10 border-2 border-dashed border-[#2D3E2F]/20 flex items-center justify-center overflow-hidden">
-      {formData.photo ? (
-        <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
-      ) : (
-        <Camera size={32} className="opacity-20" />
-      )}
-    </div>
-    <input 
-      type="text"
-      placeholder="Paste link (e.g. unsplash.com/...)"
-      className="flex-1 p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-sm font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
-      value={formData.photo || ''}
-      onChange={(e) => setFormData({...formData, photo: e.target.value})}
-    />
-  </div>
-</div>
-          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Full Name</label>
-          <input 
-            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/5"
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Age</label>
-          <input 
-            type="number"
-            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
-            value={formData.age}
-            onChange={(e) => setFormData({...formData, age: e.target.value})}
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Blood Type</label>
-          <select 
-            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none appearance-none"
-            value={formData.bloodType}
-            onChange={(e) => setFormData({...formData, bloodType: e.target.value})}
+{showUpdateModal && (
+  /* 1. Background Overlay: Added 'overflow-y-auto' so the backdrop is scrollable if needed.
+     2. Z-index: Set to 150 to ensure it stays above the header/sidebar.
+  */
+  <div className="fixed inset-0 z-[150] bg-[#2D3E2F]/60 backdrop-blur-md overflow-y-auto transition-all duration-300">
+    
+    /* Wrapper: Provides a gutter (p-4) so the modal doesn't touch screen edges on small laptops */
+    <div className="min-h-full w-full flex items-center justify-center p-4 md:p-10">
+      
+      {/* MODAL CONTAINER FIXES:
+          - max-h-[90vh]: Limits height to 90% of the screen.
+          - overflow-y-auto: Adds a scrollbar INSIDE the modal if the form is too long.
+          - no-scrollbar: Keeps the medical-editorial aesthetic clean.
+      */}
+      <div className={`w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 md:p-12 rounded-[50px] border-2 shadow-2xl ${cardClass} space-y-8 animate-in zoom-in-95 no-scrollbar`}>
+        
+        {/* Header - Fixed at the top of the modal */}
+        <div className="flex justify-between items-center border-b border-[#2D3E2F]/10 pb-6">
+          <h2 className="text-3xl font-serif italic text-[#2D3E2F]">Edit Medical Identity</h2>
+          <button 
+            onClick={() => setShowUpdateModal(false)} 
+            className="p-2 opacity-30 hover:opacity-100 transition-opacity"
           >
-            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(t => <option key={t} value={t}>{t}</option>)}
-          </select>
+            <X size={24} />
+          </button>
         </div>
-        <div className="col-span-2 space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Location</label>
-          <input 
-            className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
-            value={formData.location}
-            onChange={(e) => setFormData({...formData, location: e.target.value})}
-          />
-        </div>
-      </div>
 
-      <div className="flex gap-4 pt-6">
-        <button 
-          onClick={handleUpdate}
-          className="flex-1 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-[#2D3E2F]/20 hover:scale-[1.02] active:scale-95 transition-all"
-        >
-          Save Changes
-        </button>
-        <button 
-          onClick={() => setShowUpdateModal(false)}
-          className="px-10 py-5 bg-white border border-[#2D3E2F]/10 text-[#2D3E2F] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 transition-all"
-        >
-          Cancel
-        </button>
+        {/* Form Body */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="sm:col-span-2 space-y-4 mb-4">
+            <label className="text-[10px] font-bold uppercase tracking-widest opacity-40 ml-2 font-sans">
+              Identity Image URL
+            </label>
+            <div className="flex flex-col sm:flex-row gap-6 items-center">
+              {/* Real-time Preview */}
+              <div className="w-20 h-20 rounded-2xl bg-[#2D3E2F]/10 border-2 border-dashed border-[#2D3E2F]/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+                {formData.photo ? (
+                  <img src={formData.photo} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <Camera size={32} className="opacity-20" />
+                )}
+              </div>
+              <input 
+                type="text"
+                placeholder="Paste link (e.g. unsplash.com/...)"
+                className="w-full flex-1 p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white text-sm font-serif outline-none focus:ring-2 ring-[#2D3E2F]/20"
+                value={formData.photo || ''}
+                onChange={(e) => setFormData({...formData, photo: e.target.value})}
+              />
+            </div>
+          </div>
+
+          <div className="sm:col-span-2 space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Full Name</label>
+            <input 
+              className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none focus:ring-2 ring-[#2D3E2F]/5"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Age</label>
+            <input 
+              type="number"
+              className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
+              value={formData.age}
+              onChange={(e) => setFormData({...formData, age: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Blood Type</label>
+            <div className="relative">
+              <select 
+                className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none appearance-none"
+                value={formData.bloodType}
+                onChange={(e) => setFormData({...formData, bloodType: e.target.value})}
+              >
+                {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+          </div>
+
+          <div className="sm:col-span-2 space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest opacity-40 ml-2">Location</label>
+            <input 
+              className="w-full p-5 rounded-2xl border border-[#2D3E2F]/10 bg-white/50 text-lg font-serif outline-none"
+              value={formData.location}
+              onChange={(e) => setFormData({...formData, location: e.target.value})}
+            />
+          </div>
+        </div>
+
+        {/* Action Buttons - These will stay visible at the bottom of the modal */}
+        <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-[#2D3E2F]/5">
+          <button 
+            onClick={handleUpdate}
+            className="flex-1 py-5 bg-[#2D3E2F] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-[#2D3E2F]/20 hover:scale-[1.02] active:scale-95 transition-all"
+          >
+            Save Changes
+          </button>
+          <button 
+            onClick={() => setShowUpdateModal(false)}
+            className="px-10 py-5 bg-white border border-[#2D3E2F]/10 text-[#2D3E2F] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-600 transition-all"
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>
